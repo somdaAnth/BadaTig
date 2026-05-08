@@ -107,20 +107,17 @@ function hydrateFilters() {
 }
 
 function getFilteredRows(rows, options = {}) {
-  // Backward compat: ถ้าใส่ string เข้ามา ให้ถือเป็น dateKey
   if (typeof options === "string") options = { dateKey: options };
   const dateKey = options.dateKey || "event_date";
   const ignoreCategory = options.ignoreCategory === true;
   const ignoreDate = options.ignoreDate === true;
 
   return safeArray(rows).filter((row) => {
-    // Date filter — ใช้ field ที่ระบุ หรือ fallback ไป date/month
     const rowDate = row[dateKey] || row.date || row.month || "";
     const dateOk = ignoreDate ||
       !rowDate ||
       ((!currentFilters.start || rowDate >= currentFilters.start) &&
        (!currentFilters.end || rowDate <= currentFilters.end));
-    // Category filter — ถ้า row ไม่มี field "category" อย่า filter ออก
     const categoryOk = ignoreCategory ||
       !currentFilters.category ||
       !Object.prototype.hasOwnProperty.call(row, "category") ||
@@ -129,8 +126,6 @@ function getFilteredRows(rows, options = {}) {
   });
 }
 
-// รวม heatmap daily (event_date × weekday × hour) ให้กลับเป็น (weekday × hour)
-// หลังจาก filter ตาม date range แล้ว
 function aggregateHeatmap(heatmapDaily) {
   const grouped = {};
   safeArray(heatmapDaily).forEach((row) => {
@@ -145,8 +140,6 @@ function aggregateHeatmap(heatmapDaily) {
   return Object.values(grouped);
 }
 
-// รวม categories daily (event_date × category) ให้กลับเป็น (category)
-// หลังจาก filter ตาม date range แล้ว
 function aggregateCategories(categoriesDaily) {
   const grouped = {};
   safeArray(categoriesDaily).forEach((row) => {
@@ -160,14 +153,10 @@ function aggregateCategories(categoriesDaily) {
   return Object.values(grouped).sort((a, b) => b.revenue - a.revenue);
 }
 
-// คำนวณ KPI ของเดือนล่าสุด vs เดือนก่อนหน้า จากข้อมูลที่ filter แล้ว
-// คืน { current_month, previous_month, revenue_pct, orders_pct, buyers_pct, aov_pct,
-//       current: {...}, previous: {...} }
-// ถ้าไม่มีเดือนก่อนให้เทียบ → คืน null
 function computeMonthDeltas(dailyRevenue) {
   const monthly = {};
   safeArray(dailyRevenue).forEach((row) => {
-    const month = String(row.event_date || "").slice(0, 7); // YYYY-MM
+    const month = String(row.event_date || "").slice(0, 7); 
     if (!month || month.length !== 7) return;
     if (!monthly[month]) monthly[month] = { month, revenue: 0, orders: 0, buyers: 0, days: 0 };
     monthly[month].revenue += Number(row.revenue || 0);
@@ -213,9 +202,6 @@ function buildViewModel() {
   let customerDaily = getFilteredRows(data.customers.daily_active_users || [], { dateKey: "event_date" });
   const customerMix = getFilteredRows(data.customers.new_vs_returning || [], { dateKey: "event_date" });
 
-  // === Categories: ใช้ categories_daily เพื่อให้ filter date range มีผลกับ Donut ===
-  // ถ้ามี categories_daily ใน payload → filter by date แล้ว aggregate by category
-  // ถ้าไม่มี → fallback ไปใช้ categories aggregate เดิม (ไม่มี date breakdown)
   const categoriesDailyRaw = safeArray(data.categories.categories_daily);
   let categories;
   if (categoriesDailyRaw.length) {
@@ -231,7 +217,6 @@ function buildViewModel() {
   const segmentSummary = safeArray(data.segments.segment_summary);
   const churnRisk = safeArray(data.segments.churn_risk);
 
-  // === Heatmap: ใช้ heatmap_daily เพื่อให้ filter date range มีผล ===
   const heatmapDailyRaw = safeArray(data.time_behavior.heatmap_daily);
   let heatmap;
   if (heatmapDailyRaw.length) {
@@ -247,9 +232,6 @@ function buildViewModel() {
   const peak = data.time_behavior.peak_window || {};
   let funnel = Object.assign({}, data.funnel || {});
 
-  // ===== Filter-aware KPIs =====
-  // Daily data ของ API ไม่มี breakdown ตามหมวดหมู่ — ถ้าผู้ใช้เลือก category
-  // ให้ scale ค่ารายวันด้วย share ของหมวดนั้น (proxy ที่ดีที่สุดเท่าที่ data รองรับ)
   const totalCatRevenue = categories.reduce((s, r) => s + Number(r.revenue || 0), 0);
   const selectedCat = currentFilters.category
     ? categories.find((c) => c.category === currentFilters.category)
@@ -282,7 +264,6 @@ function buildViewModel() {
     };
   }
 
-  // คำนวณ KPIs ใหม่จากข้อมูลที่ filter แล้ว (date range หรือ category)
   const isDateFiltered =
     (currentFilters.start && currentFilters.start !== range.start) ||
     (currentFilters.end && currentFilters.end !== range.end);
@@ -302,12 +283,10 @@ function buildViewModel() {
     kpis.average_order_value = sumOrders ? sumRevenue / sumOrders : 0;
     kpis.daily_active_users_avg = avgDau;
     if (selectedCat) {
-      // ใช้ unique buyers จาก aggregate ของหมวดนั้นโดยตรง (แม่นกว่าการ scale)
       kpis.total_buyers = selectedCat.buyers;
     }
   }
 
-  // คำนวณ returning_customers_pct จาก segment_summary (ถ้า kpis ไม่มี)
   if (!kpis.returning_customers_pct) {
     const totalSeg = segmentSummary.reduce((s, r) => s + Number(r.customers || 0), 0);
     const nonNewSeg = segmentSummary
@@ -316,11 +295,9 @@ function buildViewModel() {
     kpis.returning_customers_pct = totalSeg ? (nonNewSeg / totalSeg) * 100 : 0;
   }
 
-  // สร้าง topByRevenue จาก categories เมื่อไม่มี product-level data
   let topByRevenue = getFilteredRows(data.products.top_by_revenue || []);
   let paretoProducts = getFilteredRows(data.products.pareto?.products || []);
   if (!topByRevenue.length && categories.length) {
-    // Apply category filter ที่ระดับ products fallback (categories aggregate ไม่ได้ filter ในขั้น buildViewModel)
     const productSource = currentFilters.category
       ? categories.filter((r) => r.category === currentFilters.category)
       : categories;
@@ -339,7 +316,6 @@ function buildViewModel() {
     paretoProducts = withCum;
   }
 
-  // คำนวณ % เทียบเดือนก่อนจาก filtered dailyRevenue (ของจริง ไม่ใช่ค่า hard-code)
   const monthDeltas = computeMonthDeltas(dailyRevenue);
 
   return {
@@ -365,11 +341,10 @@ function buildViewModel() {
   };
 }
 
-// แสดง KPI sub: "▲ x.x% vs เดือนก่อน" หรือซ่อนถ้าไม่มีเดือนก่อน
 function setKpiDelta(elId, deltaPct, prevMonthLabel, options = {}) {
   const el = document.getElementById(elId);
   if (!el) return;
-  const inversed = options.inversed === true; // ลด = ดี (เช่น recency)
+  const inversed = options.inversed === true;
   if (deltaPct === null || deltaPct === undefined || Number.isNaN(deltaPct)) {
     el.style.display = "none";
     el.textContent = "";
@@ -416,7 +391,6 @@ function renderFilterStatus(vm) {
 function updateCopy(vm) {
   const headerLabels = document.querySelectorAll(".hstat-label");
   if (headerLabels.length >= 5) {
-    // Scorecard label สะท้อนว่าเป็นค่ารวม "ในช่วง" (filter-aware) แทน "ล่าสุด"
     headerLabels[0].textContent = vm.isFiltered ? "GMV ในช่วง" : "GMV รวม";
     headerLabels[1].textContent = vm.isFiltered ? "ออเดอร์ในช่วง" : "ออเดอร์รวม";
     headerLabels[2].textContent = "ผู้ซื้อเฉลี่ย/วัน";
@@ -434,12 +408,9 @@ function updateCopy(vm) {
   if (funnelPanelSubs[2]) funnelPanelSubs[2].textContent = "Daily active buyers ตามข้อมูลคำสั่งซื้อ";
 }
 
-// Scorecard ที่แถบบน: ใช้ค่ารวมของช่วงที่ filter (vm.kpis ปรับให้แล้วใน buildViewModel)
-// เปอร์เซ็นต์เปรียบเทียบใช้จาก monthDeltas (เดือนล่าสุด vs เดือนก่อน — จากข้อมูลที่กรอง)
 function renderHeader(vm) {
   const md = vm.monthDeltas;
 
-  // === ค่ารวมของช่วง (อยู่กับ date filter / category filter) ===
   document.getElementById("h-gmv").textContent = compactMoney(vm.kpis.total_revenue || 0);
   document.getElementById("h-orders").textContent = number(vm.kpis.total_orders || 0);
   document.getElementById("h-visitors").textContent = number(Math.round(vm.kpis.daily_active_users_avg || 0));
@@ -447,12 +418,10 @@ function renderHeader(vm) {
     ? pct(vm.kpis.conversion_rate_pct)
     : pct(vm.kpis.returning_customers_pct);
 
-  // === Delta vs เดือนก่อน — มี md ก็แสดงจริง, ไม่มีก็แสดง "—" ===
   setHeaderDelta("h-gmv-ch", md ? md.revenue_pct : null, md ? md.previous_month : null);
   setHeaderDelta("h-orders-ch", md ? md.orders_pct : null, md ? md.previous_month : null);
   setHeaderDelta("h-vis-ch", md ? md.buyers_pct : null, md ? md.previous_month : null);
 
-  // h-cvr-ch ไม่มี monthly breakdown ตรง ๆ → แสดง info text
   const cvrCh = document.getElementById("h-cvr-ch");
   if (cvrCh) {
     cvrCh.textContent = vm.capabilities.traffic_events_available
@@ -466,7 +435,6 @@ function renderHeader(vm) {
   document.getElementById("h-latency").textContent = `อัปเดตล่าสุด ${fullDateTime(vm.meta.generated_at)}`;
 }
 
-// Helper: เซ็ต delta ของ scorecard (อยู่ใต้ตัวเลขใหญ่)
 function setHeaderDelta(elId, deltaPct, prevMonth) {
   const el = document.getElementById(elId);
   if (!el) return;
@@ -484,7 +452,6 @@ function setHeaderDelta(elId, deltaPct, prevMonth) {
 }
 
 function renderOverview(vm) {
-  // ลำดับความสำคัญของจำนวนลูกค้า: total_buyers จาก filter > segment summary > DAU avg
   const uniqueCustomers = vm.kpis.total_buyers
     || vm.segmentSummary.reduce((sum, row) => sum + Number(row.customers || 0), 0);
   document.getElementById("kpi-gmv").textContent = compactMoney(vm.kpis.total_revenue);
@@ -493,18 +460,14 @@ function renderOverview(vm) {
   document.getElementById("kpi-aov").textContent = money(vm.kpis.average_order_value);
   document.getElementById("kpi-cvr").textContent = vm.capabilities.traffic_events_available ? pct(vm.kpis.conversion_rate_pct) : "N/A";
 
-  // === % vs เดือนก่อน — คำนวณจริงจากข้อมูลที่ filter แล้ว ===
-  // ถ้ามีเดือนก่อนในช่วงที่เลือก → แสดง delta จริง, ถ้าไม่มี → ซ่อน sub-text
   const md = vm.monthDeltas;
   if (md) {
     setKpiDelta("kpi-gmv-sub", md.revenue_pct, md.previous_month);
     setKpiDelta("kpi-orders-sub", md.orders_pct, md.previous_month);
     setKpiDelta("kpi-cust-sub", md.buyers_pct, md.previous_month);
     setKpiDelta("kpi-aov-sub", md.aov_pct, md.previous_month);
-    // CVR ไม่มี monthly breakdown ตรงๆ → ซ่อนไว้ (กัน hard-code)
     setKpiDelta("kpi-cvr-sub", null, null);
   } else {
-    // ไม่มีเดือนก่อนใน filter → ซ่อน sub ทุกตัว
     setKpiDelta("kpi-gmv-sub", null, null);
     setKpiDelta("kpi-orders-sub", null, null);
     setKpiDelta("kpi-cust-sub", null, null);
@@ -553,7 +516,6 @@ function renderRevenueChart(rows) {
       },
     },
   });
-  // อัปเดต date range labels ใต้กราฟ
   const chartDateLabels = document.querySelectorAll(".rev-chart-date-label");
   if (chartDateLabels.length >= 2 && rows.length) {
     chartDateLabels[0].textContent = dateLabel(rows[0].event_date);
@@ -586,10 +548,7 @@ function renderDonut(categories, totalRevenue, selectedCategory) {
     const pctValue = (Number(category.revenue || 0) / total) * 100;
     const angle = (pctValue / 100) * 2 * Math.PI;
     const end = start + angle;
-    const cx = 60;
-    const cy = 60;
-    const r = 48;
-    const inner = 30;
+    const cx = 60, cy = 60, r = 48, inner = 30;
     const x1 = cx + r * Math.cos(start);
     const y1 = cy + r * Math.sin(start);
     const x2 = cx + r * Math.cos(end);
@@ -600,7 +559,7 @@ function renderDonut(categories, totalRevenue, selectedCategory) {
     const iy2 = cy + inner * Math.sin(end);
     const large = angle > Math.PI ? 1 : 0;
     const color = COLORS[index % COLORS.length];
-    // ถ้ามี selectedCategory ให้ highlight slice นั้น (slice อื่น opacity ต่ำลง)
+    
     const isSelected = selectedCategory && category.category === selectedCategory;
     const isDimmed = selectedCategory && !isSelected;
     const opacity = isDimmed ? 0.2 : 0.92;
@@ -614,7 +573,6 @@ function renderDonut(categories, totalRevenue, selectedCategory) {
   svg.innerHTML = paths;
   legend.innerHTML = items || '<div class="insight-body">ยังไม่มีข้อมูลหมวดสินค้า</div>';
 
-  // Donut center: ถ้าเลือกหมวด ให้โชว์รายได้ของหมวดนั้น + ชื่อหมวด ไม่งั้นโชว์ total ของทุก slice
   const donutTexts = document.querySelectorAll("#donut-svg text");
   const selectedCatRow = selectedCategory ? categories.find((c) => c.category === selectedCategory) : null;
   const centerValue = selectedCatRow ? selectedCatRow.revenue : total;
@@ -758,7 +716,7 @@ function renderCustomers(vm) {
   const returningRate = totalSegments ? (vipLoyal / totalSegments) * 100 : (vm.kpis.returning_customers_pct || 0);
   const topSegment = vm.segmentSummary[0] || {};
   const churnRate = totalSegments ? (atRisk / totalSegments) * 100 : 0;
-  // ใช้ข้อมูลจาก segment_summary แทน new_vs_returning ที่ไม่มีใน dataset
+  
   const values = [
     [number(vipLoyal), `VIP + Loyal จาก ${number(totalSegments)} ราย`],
     [number(atRisk), `กลุ่มเสี่ยงหาย (At Risk)`],
@@ -800,29 +758,10 @@ function renderSignals(vm) {
   const topCategory = vm.categories[0];
 
   if (funnel.available && Number(funnel.view || 0) > 0) {
-    // แสดง Funnel จริง: View → Cart → Purchase
     const funnelSteps = [
-      {
-        label: "ดูสินค้า (View)",
-        value: funnel.view,
-        color: "#4f8ef7",
-        widthPct: 100,
-        dropLabel: null,
-      },
-      {
-        label: "หยิบใส่ตะกร้า (Cart)",
-        value: funnel.cart,
-        color: "#ffd23f",
-        widthPct: Math.round((funnel.cart / funnel.view) * 100),
-        dropLabel: `Drop-off ${pct(funnel.drop_off_view_to_cart_pct)} จาก View`,
-      },
-      {
-        label: "สั่งซื้อสำเร็จ (Purchase)",
-        value: funnel.purchase,
-        color: "#22c55e",
-        widthPct: Math.max(1, Math.round((funnel.purchase / funnel.view) * 100)),
-        dropLabel: `Drop-off ${pct(funnel.drop_off_cart_to_purchase_pct)} จาก Cart`,
-      },
+      { label: "ดูสินค้า (View)", value: funnel.view, color: "#4f8ef7", widthPct: 100, dropLabel: null },
+      { label: "หยิบใส่ตะกร้า (Cart)", value: funnel.cart, color: "#ffd23f", widthPct: Math.round((funnel.cart / funnel.view) * 100), dropLabel: `Drop-off ${pct(funnel.drop_off_view_to_cart_pct)} จาก View` },
+      { label: "สั่งซื้อสำเร็จ (Purchase)", value: funnel.purchase, color: "#22c55e", widthPct: Math.max(1, Math.round((funnel.purchase / funnel.view) * 100)), dropLabel: `Drop-off ${pct(funnel.drop_off_cart_to_purchase_pct)} จาก Cart` },
     ];
 
     document.getElementById("funnel-steps").innerHTML = funnelSteps
@@ -859,7 +798,6 @@ function renderSignals(vm) {
       </div>
     `;
   } else {
-    // Fallback เมื่อไม่มีข้อมูล funnel
     const daily = vm.dailyRevenue;
     const avgRevenue = daily.length ? daily.reduce((s, r) => s + Number(r.revenue || 0), 0) / daily.length : 0;
     const avgOrders = daily.length ? daily.reduce((s, r) => s + Number(r.orders || 0), 0) / daily.length : 0;
@@ -942,7 +880,6 @@ window.periodChanged = function periodChanged() {
   const endEl = document.getElementById("f-end");
 
   if (!val) {
-    // "ทั้งหมด" — reset วันที่กลับเป็น full range ของ dataset
     startEl.value = dataStart || "";
     endEl.value = dataEnd || "";
   } else if (dataEnd) {
@@ -950,23 +887,19 @@ window.periodChanged = function periodChanged() {
     const startDate = new Date(endDate);
     startDate.setDate(startDate.getDate() - parseInt(val, 10) + 1);
     const startStr = startDate.toISOString().split("T")[0];
-    // ถ้า startDate ก่อน dataset start ให้ clamp
     const clampedStart = dataStart && startStr < dataStart ? dataStart : startStr;
     startEl.value = clampedStart;
     endEl.value = dataEnd;
   }
-  // Auto-apply ทันทีเมื่อเปลี่ยน period (UX ดีกว่าให้ผู้ใช้กด Apply ซ้ำ)
   applyFiltersInternal({ silent: false, fromPeriod: true });
 };
 
-// Internal apply ที่ไม่กลับไปเรียก periodChanged (ป้องกัน loop และไม่ทับค่าวันที่)
 function applyFiltersInternal(opts = {}) {
   const startEl = document.getElementById("f-start");
   const endEl = document.getElementById("f-end");
   let start = startEl.value || null;
   let end = endEl.value || null;
 
-  // Validate: ถ้า start > end ให้สลับให้
   if (start && end && start > end) {
     [start, end] = [end, start];
     startEl.value = start;
@@ -986,7 +919,6 @@ window.applyFilters = function applyFilters() {
   applyFiltersInternal({ silent: false });
 };
 
-// เคลียร์ period dropdown เมื่อผู้ใช้แก้วันที่เอง (กันค่าค้าง)
 window.dateInputChanged = function dateInputChanged() {
   const periodEl = document.getElementById("f-period");
   if (periodEl && periodEl.value) periodEl.value = "";
@@ -999,10 +931,8 @@ window.resetFilters = function resetFilters() {
     end: range.end || null,
     category: "",
   };
-  // reset period dropdown กลับเป็น "ทั้งหมด"
   const periodEl = document.getElementById("f-period");
   if (periodEl) periodEl.value = "";
-  // reset category dropdown
   const catEl = document.getElementById("f-cat");
   if (catEl) catEl.value = "";
   hydrateFilters();
@@ -1045,292 +975,6 @@ window.exportData = function exportData() {
   ];
   const csv = csvRows.map((row) => row.join(",")).join("\n");
   const a = document.createElement("a");
-  a.href = `data:text/csv;charset=utf-8,﻿${encodeURIComponent(csv)}`;
-  a.download = `kaggle_ecommerce_revenue_${filterTag}.csv`;
-  a.click();
-};
-
-window.sendPreset = function sendPreset(text) {
-  document.getElementById("ai-input").value = text;
-  window.sendAiMessage();
-};
-
-window.handleAiKey = function handleAiKey(event) {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    window.sendAiMessage();
-  }
-  event.target.style.height = "36px";
-  event.target.style.height = `${Math.min(event.target.scrollHeight, 100)}px`;
-};
-
-// =========================================================================
-// Gemini AI integration
-// API spec: https://ai.google.dev/api/generate-content
-// =========================================================================
-const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
-const GEMINI_KEY_STORAGE = "gemini_api_key";
-let aiTurns = []; // conversation history: [{ role: "user"|"model", text }]
-
-function getApiKey() {
-  try {
-    return sessionStorage.getItem(GEMINI_KEY_STORAGE) || "";
-  } catch (e) {
-    return "";
-  }
-}
-
-function getModel() {
-  const sel = document.getElementById("gemini-model");
-  return (sel && sel.value) || "gemini-2.0-flash";
-}
-
-function showApiKeySetup(show) {
-  const setup = document.getElementById("api-key-setup");
-  const selector = document.getElementById("model-selector-row");
-  const dot = document.getElementById("gemini-status-dot");
-  if (setup) setup.style.display = show ? "flex" : "none";
-  if (selector) selector.style.display = show ? "none" : "flex";
-  if (dot) {
-    if (show) {
-      dot.style.background = "#ffd23f";
-      dot.style.boxShadow = "0 0 6px #ffd23f";
-    } else {
-      dot.style.background = "#22c55e";
-      dot.style.boxShadow = "0 0 6px #22c55e";
-    }
-  }
-}
-
-window.saveApiKey = function saveApiKey() {
-  const inp = document.getElementById("gemini-api-key");
-  if (!inp) return;
-  const val = (inp.value || "").trim();
-  if (!val) {
-    showToast("กรุณากรอก API Key ก่อน");
-    return;
-  }
-  try {
-    sessionStorage.setItem(GEMINI_KEY_STORAGE, val);
-  } catch (e) {
-    showToast("เบราว์เซอร์ไม่อนุญาต sessionStorage");
-    return;
-  }
-  showApiKeySetup(false);
-  aiTurns = [];
-  showToast("บันทึก Gemini API Key แล้ว");
-  appendAiMessage("bot", "เชื่อมต่อ Gemini สำเร็จ ✓ พร้อมตอบคำถามจริงแล้วครับ — ลองถามได้เลย");
-};
-
-window.clearApiKey = function clearApiKey() {
-  try {
-    sessionStorage.removeItem(GEMINI_KEY_STORAGE);
-  } catch (e) {}
-  const inp = document.getElementById("gemini-api-key");
-  if (inp) inp.value = "";
-  showApiKeySetup(true);
-  aiTurns = [];
-  showToast("ล้าง API Key แล้ว");
-};
-
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = String(str == null ? "" : str);
-  return div.innerHTML;
-}
-
-// Markdown แบบเบา ๆ → HTML (ใช้กับ output ของ Gemini, escape ก่อน)
-function formatGeminiText(text) {
-  let safe = escapeHtml(text);
-  safe = safe.replace(/`([^`]+)`/g, '<code style="background:var(--bg4);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:11px">$1</code>');
-  safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  safe = safe.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
-  safe = safe.replace(/\n/g, "<br>");
-  safe = safe.replace(/(^|<br>)\s*[-•]\s+([^<]+?)(?=<br>|$)/g, '$1<div style="padding-left:14px;position:relative">▸ $2</div>');
-  return safe;
-}
-
-function appendAiMessage(role, contentHtml) {
-  const msgs = document.getElementById("ai-messages");
-  if (!msgs) return;
-  if (role === "user") {
-    const safe = escapeHtml(contentHtml).replace(/\n/g, "<br>");
-    msgs.insertAdjacentHTML("beforeend",
-      `<div class="ai-msg user"><div class="ai-avatar user-av">คุณ</div><div class="ai-bubble">${safe}</div></div>`);
-  } else {
-    msgs.insertAdjacentHTML("beforeend",
-      `<div class="ai-msg"><div class="ai-avatar bot">✦</div><div class="ai-bubble">${contentHtml}</div></div>`);
-  }
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function appendAiTyping() {
-  const msgs = document.getElementById("ai-messages");
-  if (!msgs) return null;
-  const id = "ai-typing-" + Date.now();
-  msgs.insertAdjacentHTML("beforeend",
-    `<div class="ai-msg" id="${id}"><div class="ai-avatar bot">✦</div><div class="ai-bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`);
-  msgs.scrollTop = msgs.scrollHeight;
-  return id;
-}
-
-function removeAiTyping(id) {
-  if (!id) return;
-  const el = document.getElementById(id);
-  if (el) el.remove();
-}
-
-// สร้าง snapshot ของ dashboard ปัจจุบันเพื่อใส่ใน prompt ให้ Gemini
-function buildGeminiContext() {
-  const vm = buildViewModel();
-  const fmt = (n) => Math.round(Number(n || 0)).toLocaleString();
-  const fmt2 = (n) => Number(n || 0).toFixed(2);
-
-  const filterLine = vm.isFiltered
-    ? "กำลังกรอง: " + (currentFilters.start || "—") + " → " + (currentFilters.end || "—") +
-      (currentFilters.category ? " | หมวด: " + currentFilters.category : "")
-    : "ไม่มีตัวกรอง (ดูข้อมูลทั้งชุด)";
-
-  const md = vm.monthDeltas;
-  const mdLine = md
-    ? "เดือน " + md.current_month + " เทียบ " + md.previous_month +
-      ": รายได้ " + fmt2(md.revenue_pct) + "%, ออเดอร์ " + fmt2(md.orders_pct) + "%, ผู้ซื้อ " + fmt2(md.buyers_pct) + "%"
-    : "ไม่มีเดือนก่อนหน้าให้เปรียบเทียบ";
-
-  const topCats = (vm.categories || []).slice(0, 5)
-    .map((c) => c.category + " (รายได้ " + fmt(c.revenue) + " บ., " + fmt(c.orders) + " ออเดอร์)")
-    .join(", ") || "—";
-
-  const topProds = (vm.topByRevenue || []).slice(0, 5)
-    .map((p) => productLabel(p) + " (" + fmt(p.revenue) + " บ.)").join(", ") || "—";
-
-  const segs = (vm.segmentSummary || [])
-    .map((s) => s.segment + ": " + fmt(s.customers) + " ราย, รายได้ " + fmt(s.revenue) + " บ.")
-    .join(" | ") || "—";
-
-  const peak = vm.peak || {};
-  const peakLine = (peak.hour !== undefined)
-    ? "weekday=" + peak.weekday + ", hour=" + peak.hour + ", orders=" + fmt(peak.orders) + ", revenue=" + fmt(peak.revenue) + " บ."
-    : "—";
-
-  return [
-    "=== Dashboard Snapshot ===",
-    filterLine,
-    "",
-    "[KPI]",
-    "- GMV รวม: " + fmt(vm.kpis.total_revenue) + " บาท",
-    "- ออเดอร์: " + fmt(vm.kpis.total_orders),
-    "- AOV: " + fmt(vm.kpis.average_order_value) + " บาท",
-    "- ผู้ซื้อเฉลี่ย/วัน: " + fmt(vm.kpis.daily_active_users_avg),
-    "- Conversion (cart→purchase): " + fmt2(vm.kpis.conversion_rate_pct) + "%",
-    "- ลูกค้ากลับมาซื้อ: " + fmt2(vm.kpis.returning_customers_pct) + "%",
-    "",
-    "[Month-over-Month] " + mdLine,
-    "",
-    "[Top 5 Categories] " + topCats,
-    "[Top 5 Products by Revenue] " + topProds,
-    "",
-    "[Funnel]",
-    "- View: " + fmt(vm.funnel.view) + ", Cart: " + fmt(vm.funnel.cart) + ", Purchase: " + fmt(vm.funnel.purchase),
-    "- View→Cart " + fmt2(vm.funnel.view_to_cart_pct) + "%, Cart→Purchase " + fmt2(vm.funnel.cart_to_purchase_pct) + "%",
-    "",
-    "[RFM Segments] " + segs,
-    "[Churn Risk] มี " + (vm.churnRisk || []).length + " ราย",
-    "[Peak Window] " + peakLine,
-  ].join("\n");
-}
-
-window.sendAiMessage = async function sendAiMessage() {
-  const input = document.getElementById("ai-input");
-  const sendBtn = document.getElementById("ai-send-btn");
-  const message = (input && input.value || "").trim();
-  if (!message) return;
-
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    showToast("กรุณากรอก Gemini API Key ก่อน 🔑");
-    showApiKeySetup(true);
-    return;
-  }
-
-  appendAiMessage("user", message);
-  input.value = "";
-  input.style.height = "36px";
-
-  const typingId = appendAiTyping();
-  if (sendBtn) sendBtn.disabled = true;
-
-  try {
-    const model = getModel();
-    const dashboardContext = buildGeminiContext();
-    const systemInstruction =
-      "คุณคือผู้ช่วย AI วิเคราะห์ข้อมูล E-Commerce ตอบเป็นภาษาไทยกระชับ ใช้ตัวเลขจาก Dashboard Snapshot ที่ให้มาเสมอ " +
-      "ให้ insight ที่ actionable (อะไรควรทำต่อ) และใช้ markdown bullet (-) หรือ **bold** ได้ ถ้าข้อมูลไม่พอให้บอกตรง ๆ ว่าต้องเก็บอะไรเพิ่ม";
-
-    const userContent = "[Dashboard ปัจจุบัน]\n" + dashboardContext + "\n\n[คำถาม] " + message;
-
-    const contents = [];
-    for (const t of aiTurns) {
-      contents.push({ role: t.role, parts: [{ text: t.text }] });
-    }
-    contents.push({ role: "user", parts: [{ text: userContent }] });
-
-    const url = GEMINI_API_BASE + "/" + encodeURIComponent(model) + ":generateContent?key=" + encodeURIComponent(apiKey);
-    const body = {
-      system_instruction: { parts: [{ text: systemInstruction }] },
-      contents: contents,
-      generationConfig: { temperature: 0.6, maxOutputTokens: 1024, topP: 0.9 },
-    };
-
-    const resp = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    if (!resp.ok) {
-      const errText = await resp.text();
-      let detail = errText;
-      try { detail = JSON.parse(errText) && JSON.parse(errText).error && JSON.parse(errText).error.message || errText; } catch (e) {}
-      throw new Error("HTTP " + resp.status + ": " + String(detail).slice(0, 300));
-    }
-
-    const data = await resp.json();
-    const reply = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
-    if (!reply) {
-      const finishReason = (data && data.candidates && data.candidates[0] && data.candidates[0].finishReason) || "unknown";
-      throw new Error("Gemini ไม่ส่งคำตอบกลับ (finishReason=" + finishReason + ")");
-    }
-
-    aiTurns.push({ role: "user", text: message });
-    aiTurns.push({ role: "model", text: reply });
-    if (aiTurns.length > 16) aiTurns = aiTurns.slice(-16);
-
-    removeAiTyping(typingId);
-    appendAiMessage("bot", formatGeminiText(reply));
-  } catch (err) {
-    removeAiTyping(typingId);
-    appendAiMessage(
-      "bot",
-      '<span style="color:var(--red)">⚠️ เรียก Gemini ไม่สำเร็จ: ' + escapeHtml(err.message) + "</span>" +
-      '<br><span style="font-size:10px;color:var(--text3)">ตรวจสอบ API Key, model, และ network</span>'
-    );
-    console.error("[Gemini]", err);
-  } finally {
-    if (sendBtn) sendBtn.disabled = false;
-  }
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadDashboardData();
-  window.setInterval(() => loadDashboardData(false), AUTO_REFRESH_MS);
-  if (getApiKey()) {
-    showApiKeySetup(false);
-  } else {
-    showApiKeySetup(true);
-  }
-});).join("\n");
-  const a = document.createElement("a");
   a.href = `data:text/csv;charset=utf-8,\uFEFF${encodeURIComponent(csv)}`;
   a.download = `kaggle_ecommerce_revenue_${filterTag}.csv`;
   a.click();
@@ -1352,11 +996,10 @@ window.handleAiKey = function handleAiKey(event) {
 
 // =========================================================================
 // Gemini AI integration
-// API spec: https://ai.google.dev/api/generate-content
 // =========================================================================
 const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 const GEMINI_KEY_STORAGE = "gemini_api_key";
-let aiTurns = []; // conversation history: [{ role: "user"|"model", text }]
+let aiTurns = [];
 
 function getApiKey() {
   try {
@@ -1403,7 +1046,7 @@ window.saveApiKey = function saveApiKey() {
     return;
   }
   showApiKeySetup(false);
-  aiTurns = []; // เริ่มประวัติใหม่เมื่อเปลี่ยน key
+  aiTurns = [];
   showToast("บันทึก Gemini API Key แล้ว ✓");
   appendAiMessage("bot", "🔑 เชื่อมต่อ Gemini สำเร็จ ตอนนี้พร้อมตอบคำถามจริงแล้วครับ — ลองถามได้เลย");
 };
@@ -1425,18 +1068,12 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-// Markdown แบบเบา ๆ → HTML (ใช้กับ output ของ Gemini เท่านั้น, escape ก่อนแล้ว)
 function formatGeminiText(text) {
   let safe = escapeHtml(text);
-  // โค้ด `inline`
   safe = safe.replace(/`([^`]+)`/g, '<code style="background:var(--bg4);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:11px">$1</code>');
-  // **bold**
   safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  // *italic* (ทำหลัง bold เพื่อกัน conflict)
   safe = safe.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
-  // bullet "- item" → <li>
   safe = safe.replace(/(^|<br>)\s*[-•]\s+(.+?)(?=<br>|$)/g, '$1<div style="padding-left:14px;position:relative">▸ $2</div>');
-  // newlines
   safe = safe.replace(/\n/g, "<br>");
   return safe;
 }
@@ -1471,7 +1108,6 @@ function removeAiTyping(id) {
   if (el) el.remove();
 }
 
-// สร้าง snapshot ของ dashboard ปัจจุบันเพื่อใส่ใน prompt ให้ Gemini
 function buildGeminiContext() {
   const vm = buildViewModel();
   const fmt = (n) => Math.round(Number(n || 0)).toLocaleString();
@@ -1543,7 +1179,6 @@ window.sendAiMessage = async function sendAiMessage() {
     return;
   }
 
-  // แสดงข้อความผู้ใช้ + clear input
   appendAiMessage("user", message);
   input.value = "";
   input.style.height = "36px";
@@ -1558,10 +1193,8 @@ window.sendAiMessage = async function sendAiMessage() {
       "คุณคือผู้ช่วย AI วิเคราะห์ข้อมูล E-Commerce ตอบเป็นภาษาไทยกระชับ ใช้ตัวเลขจาก Dashboard Snapshot ที่ให้มาเสมอ " +
       "ให้ insight ที่ actionable (อะไรควรทำต่อ) และใช้ markdown bullet หรือ bold ได้ ถ้าข้อมูลไม่พอให้บอกตรง ๆ ว่าต้องเก็บอะไรเพิ่ม";
 
-    // ใส่ snapshot ปัจจุบันเป็นข้อความนำในแต่ละ turn (เผื่อ filter เปลี่ยนระหว่าง chat)
     const userContent = `[Dashboard ปัจจุบัน]\n${dashboardContext}\n\n[คำถาม] ${message}`;
 
-    // สร้าง contents array (รวมประวัติเดิม)
     const contents = [];
     for (const t of aiTurns) {
       contents.push({ role: t.role, parts: [{ text: t.text }] });
@@ -1596,7 +1229,6 @@ window.sendAiMessage = async function sendAiMessage() {
       throw new Error(`Gemini ไม่ส่งคำตอบกลับ (finishReason=${finishReason})`);
     }
 
-    // จดประวัติสำหรับ multi-turn (เก็บเฉพาะ message สั้น ไม่รวม dashboard snapshot — กัน prompt บวม)
     aiTurns.push({ role: "user", text: message });
     aiTurns.push({ role: "model", text: reply });
     if (aiTurns.length > 16) aiTurns = aiTurns.slice(-16);
@@ -1619,7 +1251,6 @@ window.sendAiMessage = async function sendAiMessage() {
 document.addEventListener("DOMContentLoaded", () => {
   loadDashboardData();
   window.setInterval(() => loadDashboardData(false), AUTO_REFRESH_MS);
-  // Restore Gemini API key state ถ้าผู้ใช้เคยใส่ไว้
   if (getApiKey()) {
     showApiKeySetup(false);
   } else {
