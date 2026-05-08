@@ -1,0 +1,31 @@
+[2026-05-08T06:45:04.790+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2026-05-08T06:45:04.807+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: lazada_dashboard_pipeline.run_spark_aggregations scheduled__2026-05-07T02:00:00+00:00 [queued]>
+[2026-05-08T06:45:04.817+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: lazada_dashboard_pipeline.run_spark_aggregations scheduled__2026-05-07T02:00:00+00:00 [queued]>
+[2026-05-08T06:45:04.818+0000] {taskinstance.py:2866} INFO - Starting attempt 1 of 2
+[2026-05-08T06:45:04.834+0000] {taskinstance.py:2889} INFO - Executing <Task(PythonOperator): run_spark_aggregations> on 2026-05-07 02:00:00+00:00
+[2026-05-08T06:45:04.840+0000] {standard_task_runner.py:72} INFO - Started process 511 to run task
+[2026-05-08T06:45:04.842+0000] {standard_task_runner.py:104} INFO - Running: ['***', 'tasks', 'run', 'lazada_dashboard_pipeline', 'run_spark_aggregations', 'scheduled__2026-05-07T02:00:00+00:00', '--job-id', '4', '--raw', '--subdir', 'DAGS_FOLDER/lazada_dashboard_dag.py', '--cfg-path', '/tmp/tmp7lg4ff3p']
+[2026-05-08T06:45:04.844+0000] {standard_task_runner.py:105} INFO - Job 4: Subtask run_spark_aggregations
+[2026-05-08T06:45:04.896+0000] {task_command.py:467} INFO - Running <TaskInstance: lazada_dashboard_pipeline.run_spark_aggregations scheduled__2026-05-07T02:00:00+00:00 [running]> on host b77580192c62
+[2026-05-08T06:45:04.989+0000] {taskinstance.py:3132} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='lazada-dashboard' AIRFLOW_CTX_DAG_ID='lazada_dashboard_pipeline' AIRFLOW_CTX_TASK_ID='run_spark_aggregations' AIRFLOW_CTX_EXECUTION_DATE='2026-05-07T02:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-05-07T02:00:00+00:00'
+[2026-05-08T06:45:05.002+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2026-05-08T06:45:10.836+0000] {logging_mixin.py:190} INFO - [bench] [1/3] Reading CSV with Spark (csv_paths=['/home/***/.cache/kagglehub/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/versions/8/2019-Oct.csv', '/home/***/.cache/kagglehub/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/versions/8/2019-Nov.csv']) ...
+[2026-05-08T06:46:24.552+0000] {logging_mixin.py:190} INFO - [bench]      CSV read     → 50,000,000 rows in 73.67s
+[2026-05-08T06:46:24.640+0000] {logging_mixin.py:190} INFO - [bench] [2/3] Writing Parquet (batch size = 500,000 rows / file) ...
+[2026-05-08T06:46:38.587+0000] {job.py:229} INFO - Heartbeat recovered after 11.17 seconds
+[2026-05-08T06:49:42.652+0000] {logging_mixin.py:190} INFO - [bench]      Parquet write → 100 file(s), 197.97s (≈ 500,000 rows / file)
+[2026-05-08T06:49:42.654+0000] {logging_mixin.py:190} INFO - [bench] [3/3] Reading Parquet back ...
+[2026-05-08T06:49:44.941+0000] {logging_mixin.py:190} INFO - [bench]      Parquet read → 50,000,000 rows in 2.29s
+[2026-05-08T06:49:44.980+0000] {logging_mixin.py:190} INFO - [bench] DONE | CSV 73.67s vs Parquet 2.29s → PARQUET faster ×32.2
+[2026-05-08T06:49:44.983+0000] {logging_mixin.py:190} INFO - [spark] Cleaning + feature engineering...
+[2026-05-08T06:49:45.263+0000] {logging_mixin.py:190} INFO - [spark] Funnel events...
+[2026-05-08T06:50:53.114+0000] {logging_mixin.py:190} INFO - [spark] Filtering purchases & running financial aggs...
+[2026-05-08T06:51:12.675+0000] {logging_mixin.py:190} INFO - [spark] Persisting intermediates to /opt/***/project/data/_staging/scheduled__2026-05-07T02_00_00+00_00
+[2026-05-08T06:51:13.243+0000] {logging_mixin.py:190} INFO - [spark] Done.
+[2026-05-08T06:51:13.540+0000] {logging_mixin.py:190} INFO - [spark] Staging written to: /opt/***/project/data/_staging/scheduled__2026-05-07T02_00_00+00_00
+[2026-05-08T06:51:13.555+0000] {python.py:240} INFO - Done. Returned value was: /opt/***/project/data/_staging/scheduled__2026-05-07T02_00_00+00_00
+[2026-05-08T06:51:14.025+0000] {taskinstance.py:340} INFO - ::group::Post task execution logs
+[2026-05-08T06:51:14.032+0000] {taskinstance.py:352} INFO - Marking task as SUCCESS. dag_id=lazada_dashboard_pipeline, task_id=run_spark_aggregations, run_id=scheduled__2026-05-07T02:00:00+00:00, execution_date=20260507T020000, start_date=20260508T064504, end_date=20260508T065114
+[2026-05-08T06:51:14.163+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2026-05-08T06:51:14.396+0000] {taskinstance.py:3895} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2026-05-08T06:51:14.399+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

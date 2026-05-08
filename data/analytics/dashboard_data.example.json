@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "engine": "example-payload",
+    "sources": [
+      "C:\\Users\\ADMINSTRATOR\\Downloads\\archive\\2019-Oct.csv",
+      "C:\\Users\\ADMINSTRATOR\\Downloads\\archive\\2019-Nov.csv"
+    ],
+    "generated_at": "2026-05-03T04:00:00Z",
+    "total_events": 1248000,
+    "total_sessions": 342150
+  },
+  "filters": {
+    "date_range": {
+      "start": "2019-10-01",
+      "end": "2019-11-30"
+    },
+    "categories": [
+      "appliances",
+      "auto",
+      "beauty",
+      "clothing",
+      "electronics",
+      "sports"
+    ],
+    "products": [
+      { "product_id": 1003461, "category": "electronics" },
+      { "product_id": 5000088, "category": "appliances" },
+      { "product_id": 5100816, "category": "electronics" },
+      { "product_id": 2679, "category": "beauty" }
+    ]
+  },
+  "dashboard": {
+    "kpis": {
+      "total_revenue": 4875210.45,
+      "revenue_growth_pct": 6.84,
+      "average_order_value": 132.57,
+      "total_orders": 36775,
+      "conversion_rate_pct": 2.81,
+      "daily_active_users_avg": 54892.4,
+      "returning_customers_pct": 63.22,
+      "new_customers_pct": 36.78,
+      "estimated_clv": 119.84
+    }
+  },
+  "revenue": {
+    "daily": [
+      { "event_date": "2019-10-01", "revenue": 68420.13, "orders": 514, "buyers": 491, "rolling_7d": 68420.13 },
+      { "event_date": "2019-10-02", "revenue": 71225.77, "orders": 536, "buyers": 507, "rolling_7d": 69822.95 },
+      { "event_date": "2019-10-03", "revenue": 74551.11, "orders": 563, "buyers": 529, "rolling_7d": 71398.34 },
+      { "event_date": "2019-10-04", "revenue": 80140.89, "orders": 598, "buyers": 557, "rolling_7d": 73584.48 },
+      { "event_date": "2019-10-05", "revenue": 95341.42, "orders": 719, "buyers": 672, "rolling_7d": 77935.86 },
+      { "event_date": "2019-10-06", "revenue": 90218.35, "orders": 681, "buyers": 634, "rolling_7d": 78149.61 },
+      { "event_date": "2019-10-07", "revenue": 77560.42, "orders": 590, "buyers": 562, "rolling_7d": 79494.01 }
+    ],
+    "seasonality": [
+      { "day_of_week": "Sat", "avg_revenue": 92450.17 },
+      { "day_of_week": "Sun", "avg_revenue": 89320.41 },
+      { "day_of_week": "Fri", "avg_revenue": 84510.28 }
+    ]
+  },
+  "funnel": {
+    "view": 1309200,
+    "cart": 116300,
+    "purchase": 36775,
+    "view_to_cart_pct": 8.88,
+    "cart_to_purchase_pct": 31.62,
+    "drop_off_view_to_cart_pct": 91.12,
+    "drop_off_cart_to_purchase_pct": 68.38
+  },
+  "products": {
+    "top_by_revenue": [
+      { "product_id": 1003461, "category": "electronics", "category_code": "electronics.smartphone", "revenue": 325210.34, "quantity": 628, "avg_price": 517.85, "revenue_share_pct": 6.67, "cumulative_share_pct": 6.67 },
+      { "product_id": 5100816, "category": "electronics", "category_code": "electronics.audio.headphone", "revenue": 241881.12, "quantity": 982, "avg_price": 246.31, "revenue_share_pct": 4.96, "cumulative_share_pct": 11.63 },
+      { "product_id": 5000088, "category": "appliances", "category_code": "appliances.sewing_machine", "revenue": 199734.52, "quantity": 680, "avg_price": 293.72, "revenue_share_pct": 4.1, "cumulative_share_pct": 15.73 }
+    ],
+    "top_by_quantity": [
+      { "product_id": 5100816, "category": "electronics", "category_code": "electronics.audio.headphone", "revenue": 241881.12, "quantity": 982, "avg_price": 246.31 },
+      { "product_id": 1003461, "category": "electronics", "category_code": "electronics.smartphone", "revenue": 325210.34, "quantity": 628, "avg_price": 517.85 }
+    ],
+    "pareto": {
+      "top_products_for_80pct": 54,
+      "product_count": 289,
+      "top_20pct_product_count": 58,
+      "products": [
+        { "product_id": 1003461, "category": "electronics", "category_code": "electronics.smartphone", "revenue": 325210.34, "quantity": 628, "avg_price": 517.85, "revenue_share_pct": 6.67, "cumulative_share_pct": 6.67 },
+        { "product_id": 5100816, "category": "electronics", "category_code": "electronics.audio.headphone", "revenue": 241881.12, "quantity": 982, "avg_price": 246.31, "revenue_share_pct": 4.96, "cumulative_share_pct": 11.63 },
+        { "product_id": 5000088, "category": "appliances", "category_code": "appliances.sewing_machine", "revenue": 199734.52, "quantity": 680, "avg_price": 293.72, "revenue_share_pct": 4.1, "cumulative_share_pct": 15.73 }
+      ]
+    }
+  },
+  "categories": {
+    "categories": [
+      { "category": "electronics", "revenue": 2135420.55, "orders": 14891, "buyers": 13320, "revenue_share_pct": 43.8 },
+      { "category": "appliances", "revenue": 1187410.2, "orders": 9852, "buyers": 9210, "revenue_share_pct": 24.36 },
+      { "category": "beauty", "revenue": 612551.3, "orders": 6321, "buyers": 5981, "revenue_share_pct": 12.56 },
+      { "category": "sports", "revenue": 234870.18, "orders": 1844, "buyers": 1710, "revenue_share_pct": 4.82 }
+    ]
+  },
+  "time_behavior": {
+    "heatmap": [
+      { "weekday": 1, "day_name": "Mon", "hour": 20, "revenue": 31255.2, "orders": 232 },
+      { "weekday": 1, "day_name": "Mon", "hour": 21, "revenue": 33644.12, "orders": 251 },
+      { "weekday": 5, "day_name": "Fri", "hour": 20, "revenue": 40218.76, "orders": 318 },
+      { "weekday": 6, "day_name": "Sat", "hour": 21, "revenue": 44985.43, "orders": 356 }
+    ],
+    "peak_window": {
+      "weekday": 6,
+      "day_name": "Sat",
+      "hour": 21,
+      "revenue": 44985.43,
+      "orders": 356
+    }
+  },
+  "customers": {
+    "daily_active_users": [
+      { "event_date": "2019-10-01", "dau": 50321 },
+      { "event_date": "2019-10-02", "dau": 51984 },
+      { "event_date": "2019-10-03", "dau": 53111 }
+    ],
+    "new_vs_returning": [
+      { "event_date": "2019-10-01", "new": 19341, "returning": 30980 },
+      { "event_date": "2019-10-02", "new": 18562, "returning": 33422 },
+      { "event_date": "2019-10-03", "new": 18110, "returning": 35001 }
+    ],
+    "top_customers": [
+      { "user_id": 554748717, "customer_revenue": 5120.48, "purchase_count": 9, "lifetime_days": 41, "clv_estimate": 568.94, "first_seen_at": "2019-10-02T02:15:00+00:00", "last_seen_at": "2019-11-12T21:44:00+00:00" },
+      { "user_id": 520088904, "customer_revenue": 4988.19, "purchase_count": 8, "lifetime_days": 36, "clv_estimate": 623.52, "first_seen_at": "2019-10-06T07:18:00+00:00", "last_seen_at": "2019-11-11T20:03:00+00:00" }
+    ]
+  },
+  "segments": {
+    "segments": [
+      { "user_id": 554748717, "last_purchase": "2019-11-12T21:44:00+00:00", "frequency": 9, "monetary": 5120.48, "lifetime_days": 41, "recency": 18, "r_score": 2, "f_score": 3, "m_score": 3, "rfm_score": 8, "segment": "VIP" },
+      { "user_id": 520088904, "last_purchase": "2019-11-11T20:03:00+00:00", "frequency": 8, "monetary": 4988.19, "lifetime_days": 36, "recency": 19, "r_score": 2, "f_score": 3, "m_score": 3, "rfm_score": 8, "segment": "VIP" },
+      { "user_id": 541312140, "last_purchase": "2019-10-18T10:45:00+00:00", "frequency": 2, "monetary": 188.44, "lifetime_days": 18, "recency": 43, "r_score": 1, "f_score": 2, "m_score": 2, "rfm_score": 5, "segment": "At Risk" }
+    ],
+    "segment_summary": [
+      { "segment": "VIP", "customers": 982, "revenue": 1892140.35, "avg_recency": 9.8 },
+      { "segment": "Loyal", "customers": 4210, "revenue": 1651188.76, "avg_recency": 17.1 },
+      { "segment": "At Risk", "customers": 6237, "revenue": 588710.82, "avg_recency": 37.4 }
+    ],
+    "churn_risk": [
+      { "user_id": 541312140, "last_purchase": "2019-10-18T10:45:00+00:00", "frequency": 2, "monetary": 188.44, "lifetime_days": 18, "recency": 43, "r_score": 1, "f_score": 2, "m_score": 2, "rfm_score": 5, "segment": "At Risk" }
+    ]
+  },
+  "insights": [
+    {
+      "title": "Pareto Revenue Concentration",
+      "detail": "18.7% of products generate roughly 80% of total revenue.",
+      "action": "Protect inventory and performance media budget for these hero SKUs first."
+    },
+    {
+      "title": "Peak Purchase Window",
+      "detail": "Sat at 21:00 delivers the highest purchase volume.",
+      "action": "Schedule flash deals and CRM pushes during the 20:00-22:00 window."
+    },
+    {
+      "title": "Cart Checkout Friction",
+      "detail": "Cart to purchase drop-off is 68.38%, higher than expected for a healthy checkout path.",
+      "action": "Audit shipping fee visibility, payment failures, and checkout page speed."
+    },
+    {
+      "title": "Category Performance Gap",
+      "detail": "Electronics leads revenue while Sports is the weakest category in this sample output.",
+      "action": "Review assortment depth and promotional positioning in weaker categories."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+[2026-05-08T07:10:01.534+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2026-05-08T07:10:02.202+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: lazada_dashboard_pipeline.cleanup_staging manual__2026-05-08T06:35:33.233697+00:00 [queued]>
+[2026-05-08T07:10:02.343+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: lazada_dashboard_pipeline.cleanup_staging manual__2026-05-08T06:35:33.233697+00:00 [queued]>
+[2026-05-08T07:10:02.348+0000] {taskinstance.py:2866} INFO - Starting attempt 1 of 2
+[2026-05-08T07:10:02.543+0000] {taskinstance.py:2889} INFO - Executing <Task(PythonOperator): cleanup_staging> on 2026-05-08 06:35:33.233697+00:00
+[2026-05-08T07:10:02.547+0000] {standard_task_runner.py:72} INFO - Started process 3724 to run task
+[2026-05-08T07:10:02.568+0000] {standard_task_runner.py:104} INFO - Running: ['***', 'tasks', 'run', 'lazada_dashboard_pipeline', 'cleanup_staging', 'manual__2026-05-08T06:35:33.233697+00:00', '--job-id', '13', '--raw', '--subdir', 'DAGS_FOLDER/lazada_dashboard_dag.py', '--cfg-path', '/tmp/tmpdjowj6zh']
+[2026-05-08T07:10:02.570+0000] {standard_task_runner.py:105} INFO - Job 13: Subtask cleanup_staging
+[2026-05-08T07:10:02.871+0000] {task_command.py:467} INFO - Running <TaskInstance: lazada_dashboard_pipeline.cleanup_staging manual__2026-05-08T06:35:33.233697+00:00 [running]> on host b77580192c62
+[2026-05-08T07:10:04.239+0000] {taskinstance.py:3132} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='lazada-dashboard' AIRFLOW_CTX_DAG_ID='lazada_dashboard_pipeline' AIRFLOW_CTX_TASK_ID='cleanup_staging' AIRFLOW_CTX_EXECUTION_DATE='2026-05-08T06:35:33.233697+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-05-08T06:35:33.233697+00:00'
+[2026-05-08T07:10:04.268+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2026-05-08T07:10:05.050+0000] {logging_mixin.py:190} INFO - [cleanup] Removed /opt/***/project/data/_staging/manual__2026-05-08T06_35_33.233697+00_00
+[2026-05-08T07:10:05.052+0000] {python.py:240} INFO - Done. Returned value was: None
+[2026-05-08T07:10:05.068+0000] {taskinstance.py:340} INFO - ::group::Post task execution logs
+[2026-05-08T07:10:05.069+0000] {taskinstance.py:352} INFO - Marking task as SUCCESS. dag_id=lazada_dashboard_pipeline, task_id=cleanup_staging, run_id=manual__2026-05-08T06:35:33.233697+00:00, execution_date=20260508T063533, start_date=20260508T071002, end_date=20260508T071005
+[2026-05-08T07:10:05.106+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2026-05-08T07:10:05.136+0000] {taskinstance.py:3895} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-05-08T07:10:05.139+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

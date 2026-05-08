@@ -1,0 +1,578 @@
+[2026-05-08T07:01:31.046+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2026-05-08T07:01:31.103+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: lazada_dashboard_pipeline.run_spark_aggregations manual__2026-05-08T06:35:33.233697+00:00 [queued]>
+[2026-05-08T07:01:31.115+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: lazada_dashboard_pipeline.run_spark_aggregations manual__2026-05-08T06:35:33.233697+00:00 [queued]>
+[2026-05-08T07:01:31.116+0000] {taskinstance.py:2866} INFO - Starting attempt 2 of 2
+[2026-05-08T07:01:31.137+0000] {taskinstance.py:2889} INFO - Executing <Task(PythonOperator): run_spark_aggregations> on 2026-05-08 06:35:33.233697+00:00
+[2026-05-08T07:01:31.142+0000] {standard_task_runner.py:72} INFO - Started process 2788 to run task
+[2026-05-08T07:01:31.159+0000] {standard_task_runner.py:104} INFO - Running: ['***', 'tasks', 'run', 'lazada_dashboard_pipeline', 'run_spark_aggregations', 'manual__2026-05-08T06:35:33.233697+00:00', '--job-id', '12', '--raw', '--subdir', 'DAGS_FOLDER/lazada_dashboard_dag.py', '--cfg-path', '/tmp/tmpsck9midt']
+[2026-05-08T07:01:31.161+0000] {standard_task_runner.py:105} INFO - Job 12: Subtask run_spark_aggregations
+[2026-05-08T07:01:31.219+0000] {task_command.py:467} INFO - Running <TaskInstance: lazada_dashboard_pipeline.run_spark_aggregations manual__2026-05-08T06:35:33.233697+00:00 [running]> on host b77580192c62
+[2026-05-08T07:01:31.363+0000] {taskinstance.py:3132} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='lazada-dashboard' AIRFLOW_CTX_DAG_ID='lazada_dashboard_pipeline' AIRFLOW_CTX_TASK_ID='run_spark_aggregations' AIRFLOW_CTX_EXECUTION_DATE='2026-05-08T06:35:33.233697+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-05-08T06:35:33.233697+00:00'
+[2026-05-08T07:01:31.365+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2026-05-08T07:01:39.185+0000] {logging_mixin.py:190} INFO - [bench] [1/3] Reading CSV with Spark (csv_paths=['/home/***/.cache/kagglehub/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/versions/8/2019-Oct.csv', '/home/***/.cache/kagglehub/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/versions/8/2019-Nov.csv']) ...
+[2026-05-08T07:02:27.123+0000] {job.py:229} INFO - Heartbeat recovered after 18.56 seconds
+[2026-05-08T07:02:36.453+0000] {job.py:229} INFO - Heartbeat recovered after 13.55 seconds
+[2026-05-08T07:03:43.229+0000] {logging_mixin.py:190} INFO - [bench]      CSV read     → 50,000,000 rows in 124.05s
+[2026-05-08T07:03:43.656+0000] {logging_mixin.py:190} INFO - [bench] [2/3] Writing Parquet (batch size = 500,000 rows / file) ...
+[2026-05-08T07:05:28.939+0000] {job.py:229} INFO - Heartbeat recovered after 12.51 seconds
+[2026-05-08T07:07:40.436+0000] {job.py:229} INFO - Heartbeat recovered after 12.23 seconds
+[2026-05-08T07:07:45.488+0000] {job.py:229} INFO - Heartbeat recovered after 11.70 seconds
+[2026-05-08T07:08:53.450+0000] {logging_mixin.py:190} INFO - [bench]      Parquet write → 100 file(s), 309.13s (≈ 500,000 rows / file)
+[2026-05-08T07:08:53.585+0000] {logging_mixin.py:190} INFO - [bench] [3/3] Reading Parquet back ...
+[2026-05-08T07:08:59.693+0000] {logging_mixin.py:190} INFO - [bench]      Parquet read → 50,000,000 rows in 6.09s
+[2026-05-08T07:09:00.017+0000] {logging_mixin.py:190} INFO - [bench] DONE | CSV 124.05s vs Parquet 6.09s → PARQUET faster ×20.36
+[2026-05-08T07:09:00.048+0000] {logging_mixin.py:190} INFO - [spark] Cleaning + feature engineering...
+[2026-05-08T07:09:01.772+0000] {logging_mixin.py:190} INFO - [spark] Funnel events...
+[2026-05-08T07:09:33.958+0000] {clientserver.py:563} INFO - Error while receiving.
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/conversion.py", line 304, in _collect_as_arrow
+    results = list(batch_stream)
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/serializers.py", line 87, in load_stream
+    for batch in self.serializer.load_stream(stream):
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/serializers.py", line 132, in load_stream
+    reader = pa.ipc.open_stream(stream)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyarrow/ipc.py", line 190, in open_stream
+    return RecordBatchStreamReader(source, options=options,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyarrow/ipc.py", line 52, in __init__
+    self._open(source, options=options, memory_pool=memory_pool)
+  File "pyarrow/ipc.pxi", line 1001, in pyarrow.lib._RecordBatchStreamReader._open
+  File "pyarrow/error.pxi", line 154, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 91, in pyarrow.lib.check_status
+pyarrow.lib.ArrowInvalid: Tried reading schema message, was null or length 0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 540, in send_command
+    raise Py4JNetworkError(
+py4j.protocol.Py4JNetworkError: Answer from Java side is empty
+[2026-05-08T07:09:35.215+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:35.329+0000] {java_gateway.py:1056} INFO - Exception while sending command.
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/conversion.py", line 304, in _collect_as_arrow
+    results = list(batch_stream)
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/serializers.py", line 87, in load_stream
+    for batch in self.serializer.load_stream(stream):
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/serializers.py", line 132, in load_stream
+    reader = pa.ipc.open_stream(stream)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyarrow/ipc.py", line 190, in open_stream
+    return RecordBatchStreamReader(source, options=options,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyarrow/ipc.py", line 52, in __init__
+    self._open(source, options=options, memory_pool=memory_pool)
+  File "pyarrow/ipc.pxi", line 1001, in pyarrow.lib._RecordBatchStreamReader._open
+  File "pyarrow/error.pxi", line 154, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 91, in pyarrow.lib.check_status
+pyarrow.lib.ArrowInvalid: Tried reading schema message, was null or length 0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1038, in send_command
+    response = connection.send_command(command)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 540, in send_command
+    raise Py4JNetworkError(
+py4j.protocol.Py4JNetworkError: Answer from Java side is empty
+[2026-05-08T07:09:33.946+0000] {job.py:239} ERROR - Job heartbeat failed with error
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3371, in _wrap_pool_connect
+    return fn()
+           ^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 327, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 894, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 493, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 256, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 273, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in __init__
+    self.__connect()
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 690, in __connect
+    with util.safe_reraise():
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/util/compat.py", line 211, in raise_
+    raise exception
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 686, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 574, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 598, in connect
+    return self.dbapi.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: could not translate host name "postgres" to address: Temporary failure in name resolution
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/jobs/job.py", line 233, in heartbeat
+    heartbeat_callback(session)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/session.py", line 94, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/jobs/local_task_job_runner.py", line 284, in heartbeat_callback
+    self.task_instance.refresh_from_db()
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/session.py", line 97, in wrapper
+    return func(*args, session=session, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 2359, in refresh_from_db
+    _refresh_from_db(task_instance=self, session=session, lock_for_update=lock_for_update)
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 872, in _refresh_from_db
+    ti = TaskInstance.get_task_instance(
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/api_internal/internal_api_call.py", line 166, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/session.py", line 94, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 2345, in get_task_instance
+    return query.one_or_none()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2850, in one_or_none
+    return self._iter().one_or_none()
+           ^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2916, in _iter
+    result = self.session.execute(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1716, in execute
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1555, in _connection_for_bind
+    return self._transaction._connection_for_bind(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 750, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/future/engine.py", line 412, in connect
+    return super(Engine, self).connect()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3325, in connect
+    return self._connection_cls(self, close_with_result=close_with_result)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 96, in __init__
+    else engine.raw_connection()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3404, in raw_connection
+    return self._wrap_pool_connect(self.pool.connect, _connection)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3374, in _wrap_pool_connect
+    Connection._handle_dbapi_exception_noconnection(
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2208, in _handle_dbapi_exception_noconnection
+    util.raise_(
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/util/compat.py", line 211, in raise_
+    raise exception
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3371, in _wrap_pool_connect
+    return fn()
+           ^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 327, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 894, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 493, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 256, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 273, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in __init__
+    self.__connect()
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 690, in __connect
+    with util.safe_reraise():
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/util/compat.py", line 211, in raise_
+    raise exception
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 686, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 574, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 598, in connect
+    return self.dbapi.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+[2026-05-08T07:09:35.446+0000] {job.py:254} ERROR - Job heartbeat failed with error. Scheduler is in unhealthy state
+[2026-05-08T07:09:35.451+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:36.449+0000] {logging_mixin.py:190} WARNING - /home/***/.local/lib/python3.11/site-packages/pyspark/sql/pandas/conversion.py:184 UserWarning: toPandas attempted Arrow optimization because 'spark.sql.execution.arrow.pyspark.enabled' is set to true, but has reached the error below and can not continue. Note that 'spark.sql.execution.arrow.pyspark.fallback.enabled' does not have an effect on failures in the middle of computation.
+  [Errno 111] Connection refused
+[2026-05-08T07:09:36.533+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:37.447+0000] {taskinstance.py:3311} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/conversion.py", line 304, in _collect_as_arrow
+    results = list(batch_stream)
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/serializers.py", line 87, in load_stream
+    for batch in self.serializer.load_stream(stream):
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/serializers.py", line 132, in load_stream
+    reader = pa.ipc.open_stream(stream)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyarrow/ipc.py", line 190, in open_stream
+    return RecordBatchStreamReader(source, options=options,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyarrow/ipc.py", line 52, in __init__
+    self._open(source, options=options, memory_pool=memory_pool)
+  File "pyarrow/ipc.pxi", line 1001, in pyarrow.lib._RecordBatchStreamReader._open
+  File "pyarrow/error.pxi", line 154, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 91, in pyarrow.lib.check_status
+pyarrow.lib.ArrowInvalid: Tried reading schema message, was null or length 0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1038, in send_command
+    response = connection.send_command(command)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 540, in send_command
+    raise Py4JNetworkError(
+py4j.protocol.Py4JNetworkError: Answer from Java side is empty
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/airflow/project/data/build_kaggle_spark.py", line 236, in run_spark_aggregations
+    events_count_df = df.groupBy("event_type").count().toPandas()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/classic/dataframe.py", line 1816, in toPandas
+    return PandasConversionMixin.toPandas(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/conversion.py", line 114, in toPandas
+    batches = self._collect_as_arrow(split_batches=self_destruct)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/conversion.py", line 308, in _collect_as_arrow
+    jsocket_auth_server.getResult()
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1361, in __call__
+    answer = self.gateway_client.send_command(command)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1057, in send_command
+    response = self.send_command(command, retry, binary=binary)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1036, in send_command
+    connection = self._get_connection()
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 284, in _get_connection
+    connection = self._create_new_connection()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 291, in _create_new_connection
+    connection.connect_to_java_server()
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 438, in connect_to_java_server
+    self.socket.connect((self.java_address, self.java_port))
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 762, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 733, in _execute_callable
+    return ExecutionCallableRunner(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/operator_helpers.py", line 252, in run
+    return self.func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/baseoperator.py", line 417, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/python.py", line 238, in execute
+    return_value = self.execute_callable()
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/python.py", line 256, in execute_callable
+    return runner.run(*self.op_args, **self.op_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/operator_helpers.py", line 252, in run
+    return self.func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/airflow/dags/lazada_dashboard_dag.py", line 98, in _run_spark_aggregations
+    staging = run_spark_aggregations(
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/airflow/project/data/build_kaggle_spark.py", line 376, in run_spark_aggregations
+    spark.stop()
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/session.py", line 2029, in stop
+    self._sc.stop()
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/core/context.py", line 703, in stop
+    self._jsc.stop()
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1361, in __call__
+    answer = self.gateway_client.send_command(command)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1036, in send_command
+    connection = self._get_connection()
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 284, in _get_connection
+    connection = self._create_new_connection()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 291, in _create_new_connection
+    connection.connect_to_java_server()
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 438, in connect_to_java_server
+    self.socket.connect((self.java_address, self.java_port))
+ConnectionRefusedError: [Errno 111] Connection refused
+[2026-05-08T07:09:40.484+0000] {job.py:229} INFO - Heartbeat recovered after 20.88 seconds
+[2026-05-08T07:09:40.514+0000] {clientserver.py:563} INFO - Error while receiving.
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 540, in send_command
+    raise Py4JNetworkError(
+py4j.protocol.Py4JNetworkError: Answer from Java side is empty
+[2026-05-08T07:09:40.562+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.597+0000] {java_gateway.py:1056} INFO - Exception while sending command.
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1038, in send_command
+    response = connection.send_command(command)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 540, in send_command
+    raise Py4JNetworkError(
+py4j.protocol.Py4JNetworkError: Answer from Java side is empty
+[2026-05-08T07:09:40.626+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.656+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.679+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.699+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.726+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.740+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.741+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.743+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.744+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.745+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.746+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.747+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.748+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.749+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.750+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.751+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.739+0000] {taskinstance.py:1225} INFO - Marking task as FAILED. dag_id=lazada_dashboard_pipeline, task_id=run_spark_aggregations, run_id=manual__2026-05-08T06:35:33.233697+00:00, execution_date=20260508T063533, start_date=20260508T070131, end_date=20260508T070940
+[2026-05-08T07:09:40.752+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.781+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.828+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.854+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.856+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.858+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.903+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.931+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.962+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.981+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:40.988+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.006+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.032+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.057+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.078+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.100+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.118+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.152+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.173+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.202+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.236+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.257+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.285+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.306+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.354+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.365+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.404+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.415+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.435+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.455+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.467+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.468+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.469+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.471+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.472+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.474+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.475+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.476+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.477+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.496+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.498+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.499+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.500+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.514+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.515+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.516+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.517+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.518+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.520+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.521+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.523+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.535+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.536+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.537+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.538+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.540+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.541+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.542+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.620+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.655+0000] {taskinstance.py:340} INFO - ::group::Post task execution logs
+[2026-05-08T07:09:41.655+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.747+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:41.790+0000] {standard_task_runner.py:124} ERROR - Failed to execute job 12 for task run_spark_aggregations ([Errno 111] Connection refused; 2788)
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/conversion.py", line 304, in _collect_as_arrow
+    results = list(batch_stream)
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/serializers.py", line 87, in load_stream
+    for batch in self.serializer.load_stream(stream):
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/serializers.py", line 132, in load_stream
+    reader = pa.ipc.open_stream(stream)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyarrow/ipc.py", line 190, in open_stream
+    return RecordBatchStreamReader(source, options=options,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyarrow/ipc.py", line 52, in __init__
+    self._open(source, options=options, memory_pool=memory_pool)
+  File "pyarrow/ipc.pxi", line 1001, in pyarrow.lib._RecordBatchStreamReader._open
+  File "pyarrow/error.pxi", line 154, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 91, in pyarrow.lib.check_status
+pyarrow.lib.ArrowInvalid: Tried reading schema message, was null or length 0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1038, in send_command
+    response = connection.send_command(command)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 540, in send_command
+    raise Py4JNetworkError(
+py4j.protocol.Py4JNetworkError: Answer from Java side is empty
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/airflow/project/data/build_kaggle_spark.py", line 236, in run_spark_aggregations
+    events_count_df = df.groupBy("event_type").count().toPandas()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/classic/dataframe.py", line 1816, in toPandas
+    return PandasConversionMixin.toPandas(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/conversion.py", line 114, in toPandas
+    batches = self._collect_as_arrow(split_batches=self_destruct)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/pandas/conversion.py", line 308, in _collect_as_arrow
+    jsocket_auth_server.getResult()
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1361, in __call__
+    answer = self.gateway_client.send_command(command)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1057, in send_command
+    response = self.send_command(command, retry, binary=binary)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1036, in send_command
+    connection = self._get_connection()
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 284, in _get_connection
+    connection = self._create_new_connection()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 291, in _create_new_connection
+    connection.connect_to_java_server()
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 438, in connect_to_java_server
+    self.socket.connect((self.java_address, self.java_port))
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/task/task_runner/standard_task_runner.py", line 117, in _start_by_fork
+    ret = args.func(args, dag=self.dag)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/cli_config.py", line 49, in command
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/cli.py", line 116, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/commands/task_command.py", line 483, in task_run
+    task_return_code = _run_task_by_selected_method(args, _dag, ti)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/commands/task_command.py", line 256, in _run_task_by_selected_method
+    return _run_raw_task(args, ti)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/commands/task_command.py", line 341, in _run_raw_task
+    return ti._run_raw_task(
+           ^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/session.py", line 97, in wrapper
+    return func(*args, session=session, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 3005, in _run_raw_task
+    return _run_raw_task(
+           ^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 273, in _run_raw_task
+    TaskInstance._execute_task_with_callbacks(
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 3159, in _execute_task_with_callbacks
+    result = self._execute_task(context, task_orig)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 3183, in _execute_task
+    return _execute_task(self, context, task_orig)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 762, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 733, in _execute_callable
+    return ExecutionCallableRunner(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/operator_helpers.py", line 252, in run
+    return self.func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/baseoperator.py", line 417, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/python.py", line 238, in execute
+    return_value = self.execute_callable()
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/python.py", line 256, in execute_callable
+    return runner.run(*self.op_args, **self.op_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/operator_helpers.py", line 252, in run
+    return self.func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/airflow/dags/lazada_dashboard_dag.py", line 98, in _run_spark_aggregations
+    staging = run_spark_aggregations(
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/airflow/project/data/build_kaggle_spark.py", line 376, in run_spark_aggregations
+    spark.stop()
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/sql/session.py", line 2029, in stop
+    self._sc.stop()
+  File "/home/airflow/.local/lib/python3.11/site-packages/pyspark/core/context.py", line 703, in stop
+    self._jsc.stop()
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1361, in __call__
+    answer = self.gateway_client.send_command(command)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/java_gateway.py", line 1036, in send_command
+    connection = self._get_connection()
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 284, in _get_connection
+    connection = self._create_new_connection()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 291, in _create_new_connection
+    connection.connect_to_java_server()
+  File "/home/airflow/.local/lib/python3.11/site-packages/py4j/clientserver.py", line 438, in connect_to_java_server
+    self.socket.connect((self.java_address, self.java_port))
+ConnectionRefusedError: [Errno 111] Connection refused
+[2026-05-08T07:09:41.790+0000] {clientserver.py:570} INFO - Closing down clientserver connection
+[2026-05-08T07:09:42.139+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 1
+[2026-05-08T07:09:42.935+0000] {taskinstance.py:3895} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-05-08T07:09:43.008+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

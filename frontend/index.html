@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>E-Commerce Analytics Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c10;--bg2:#111318;--bg3:#181b22;--bg4:#1e2230;
+  --border:#ffffff12;--border2:#ffffff20;
+  --text:#e8eaf0;--text2:#9096a8;--text3:#5a6075;
+  --orange:#ff6b35;--orange2:#ff8c5a;--orangeB:#ff6b3520;
+  --teal:#00d4aa;--teal2:#00f0c0;--tealB:#00d4aa18;
+  --blue:#4f8ef7;--blueB:#4f8ef718;
+  --purple:#9b6fff;--purpleB:#9b6fff18;
+  --red:#ff4d6d;--redB:#ff4d6d18;
+  --yellow:#ffd23f;--yellowB:#ffd23f18;
+  --green:#22c55e;--greenB:#22c55e18;
+  --gemini:#4285f4;--gemini2:#34a853;--geminiB:#4285f418;
+  --r:10px;--r2:14px;--r3:20px;
+  --font:'Noto Sans Thai',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+.shell{display:flex;flex-direction:column;gap:0;min-height:100vh}
+.header{background:linear-gradient(135deg,#0e1420 0%,#0a1228 50%,#0d1220 100%);border-bottom:1px solid var(--border2);padding:20px 24px 0;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;background:radial-gradient(circle,rgba(255,107,53,.08) 0%,transparent 70%);pointer-events:none}
+.header::after{content:'';position:absolute;bottom:-60px;left:200px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,212,170,.06) 0%,transparent 70%);pointer-events:none}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--orange),var(--orange2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.brand-sub{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:500;border-radius:8px;padding:7px 14px;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:hover{background:var(--orange2);transform:translateY(-1px)}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+.btn-gemini{background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;font-weight:600}
+.btn-gemini:hover{opacity:.9;transform:translateY(-1px)}
+.header-stats{display:flex;gap:0;border-top:1px solid var(--border)}
+.hstat{padding:12px 20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:2px;min-width:120px}
+.hstat:last-child{border-right:none}
+.hstat-label{font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px}
+.hstat-value{font-size:18px;font-weight:700;font-family:var(--mono);color:var(--text)}
+.hstat-change{font-size:11px;display:flex;align-items:center;gap:4px}
+.up{color:var(--teal)}.down{color:var(--red)}
+.nav{display:flex;gap:4px;padding:0 24px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto}
+.nav-tab{padding:11px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.nav-tab:hover{color:var(--text2)}
+.nav-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.badge{display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:4px;vertical-align:middle}
+.main{padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.filter-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.filter-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.filter-input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:6px 10px;outline:none;transition:border .15s}
+.filter-input:focus{border-color:var(--orange)}
+select.filter-input option{background:var(--bg3)}
+.filter-sep{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;position:relative;overflow:hidden;cursor:default;transition:border .2s}
+.kpi:hover{border-color:var(--border2)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r2) var(--r2) 0 0}
+.kpi.orange::before{background:linear-gradient(90deg,var(--orange),var(--orange2))}
+.kpi.teal::before{background:linear-gradient(90deg,var(--teal),var(--teal2))}
+.kpi.blue::before{background:linear-gradient(90deg,var(--blue),#7ab0ff)}
+.kpi.purple::before{background:linear-gradient(90deg,var(--purple),#c4a0ff)}
+.kpi.red::before{background:linear-gradient(90deg,var(--red),#ff8099)}
+.kpi-label{font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:700;font-family:var(--mono);color:var(--text);margin-bottom:4px;line-height:1}
+.kpi-sub{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.kpi-icon{position:absolute;right:14px;top:14px;font-size:20px;opacity:.3}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-60-40{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.panel-head{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.panel-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.panel-sub{font-size:11px;color:var(--text3)}
+.panel-body{padding:18px}
+.pill{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:600;font-family:var(--mono);white-space:nowrap}
+.pill-orange{background:var(--orangeB);color:var(--orange)}
+.pill-teal{background:var(--tealB);color:var(--teal)}
+.pill-blue{background:var(--blueB);color:var(--blue)}
+.pill-purple{background:var(--purpleB);color:var(--purple)}
+.pill-red{background:var(--redB);color:var(--red)}
+.pill-yellow{background:var(--yellowB);color:var(--yellow)}
+.pill-green{background:var(--greenB);color:var(--green)}
+.pill-gemini{background:var(--geminiB);color:var(--gemini)}
+.chart-area{padding:0 16px 16px;position:relative}
+.chart-canvas-wrap{position:relative;width:100%}
+.mini-bars{display:flex;align-items:flex-end;gap:3px;height:60px;padding:0 18px 0}
+.mini-bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;transition:all .3s;cursor:pointer;position:relative}
+.mini-bar:hover{opacity:.8}
+.mini-bar-tip{position:absolute;top:-24px;left:50%;transform:translateX(-50%);background:var(--bg4);color:var(--text);font-size:10px;padding:2px 6px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
+.mini-bar:hover .mini-bar-tip{opacity:1}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:8px 12px;text-align:left;color:var(--text3);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--border);font-family:var(--mono)}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text2)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.02);color:var(--text)}
+.tbl-num{font-family:var(--mono);text-align:right}
+.tbl-wrap{max-height:280px;overflow-y:auto;margin:0 4px}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:600}
+.tag-green{background:var(--greenB);color:var(--green)}
+.tag-red{background:var(--redB);color:var(--red)}
+.tag-yellow{background:var(--yellowB);color:var(--yellow)}
+.tag-blue{background:var(--blueB);color:var(--blue)}
+.tag-orange{background:var(--orangeB);color:var(--orange)}
+.donut-wrap{display:flex;align-items:center;gap:20px;padding:0 18px 16px}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:8px}
+.donut-item{display:flex;align-items:center;gap:8px}
+.donut-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.donut-name{font-size:12px;color:var(--text2);flex:1}
+.donut-val{font-size:12px;font-family:var(--mono);color:var(--text);font-weight:500}
+.heatmap-row{display:flex;gap:3px;align-items:center;margin-bottom:2px}
+.heatmap-label{width:22px;font-size:10px;color:var(--text3);font-family:var(--mono);text-align:right;flex-shrink:0}
+.heatmap-cell{width:28px;height:22px;border-radius:4px;cursor:pointer;transition:transform .1s;position:relative}
+.heatmap-cell:hover{transform:scale(1.15);z-index:1}
+.heatmap-col-labels{display:flex;gap:3px;padding-left:30px;margin-bottom:2px}
+.heatmap-col-label{width:28px;font-size:9px;color:var(--text3);text-align:center;font-family:var(--mono)}
+/* GEMINI AI CHAT */
+.ai-panel{display:flex;flex-direction:column}
+.ai-messages{padding:14px 16px;display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto;flex:1}
+.ai-messages::-webkit-scrollbar{width:3px}
+.ai-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.ai-msg{display:flex;gap:8px;align-items:flex-start}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-avatar{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ai-avatar.bot{background:linear-gradient(135deg,#4285f4 0%,#34a853 40%,#fbbc05 70%,#ea4335 100%)}
+.ai-avatar.user-av{background:var(--bg4);border:1px solid var(--border2);color:var(--text2);font-size:11px;font-weight:600}
+.ai-bubble{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 13px;max-width:85%;font-size:12px;color:var(--text2);line-height:1.6}
+.ai-msg.user .ai-bubble{background:var(--orangeB);border-color:var(--orange);color:var(--text)}
+.api-key-box{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:18px;margin:12px 16px;display:flex;flex-direction:column;gap:10px}
+.api-key-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px}
+.api-key-sub{font-size:11px;color:var(--text3);line-height:1.5}
+.api-key-row{display:flex;gap:8px}
+.api-key-input{flex:1;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 12px;outline:none;transition:border .15s}
+.api-key-input:focus{border-color:var(--gemini)}
+.btn-gemini-sm{background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:opacity .15s}
+.btn-gemini-sm:hover{opacity:.88}
+.api-key-hint{font-size:10px;color:var(--text3)}
+.api-key-hint a{color:var(--gemini);text-decoration:none}
+.api-key-hint a:hover{text-decoration:underline}
+.model-selector{display:flex;align-items:center;gap:6px;padding:6px 14px;border-bottom:1px solid var(--border);background:rgba(66,133,244,.04)}
+.model-label{font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px}
+.model-select{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-family:var(--mono);font-size:11px;padding:3px 8px;outline:none;cursor:pointer}
+.model-select:focus{border-color:var(--gemini)}
+.ai-input-row{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px}
+.ai-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:8px 12px;outline:none;resize:none;min-height:36px;max-height:100px}
+.ai-input:focus{border-color:var(--gemini)}
+.ai-send{background:linear-gradient(135deg,#4285f4,#34a853);border:none;border-radius:8px;color:#fff;cursor:pointer;padding:8px 14px;font-size:12px;font-weight:600;font-family:var(--font);transition:opacity .15s;white-space:nowrap}
+.ai-send:hover{opacity:.88}
+.ai-send:disabled{opacity:.4;cursor:not-allowed}
+.ai-chips{padding:6px 14px;display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--border)}
+.ai-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3);font-size:11px;padding:4px 10px;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.ai-chip:hover{border-color:var(--gemini);color:var(--gemini);background:var(--geminiB)}
+.funnel{padding:8px 18px 16px;display:flex;flex-direction:column;gap:6px}
+.funnel-bar-wrap{display:flex;align-items:center;gap:10px}
+.funnel-bar-bg{flex:1;height:30px;background:var(--bg4);border-radius:6px;overflow:hidden}
+.funnel-bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:11px;font-weight:600;font-family:var(--mono);transition:width 1s ease}
+.funnel-label{font-size:12px;color:var(--text2);min-width:90px}
+.funnel-pct{font-size:11px;font-family:var(--mono);color:var(--text3);min-width:36px;text-align:right}
+.funnel-drop{font-size:10px;color:var(--red);padding:2px 0 2px 100px}
+.seg-bars{padding:0 18px 16px;display:flex;flex-direction:column;gap:8px}
+.seg-row{display:flex;align-items:center;gap:10px}
+.seg-label{font-size:11px;color:var(--text2);min-width:100px}
+.seg-bar-bg{flex:1;height:16px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.seg-bar-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.seg-val{font-size:11px;font-family:var(--mono);color:var(--text3);min-width:50px;text-align:right}
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
+.dot-green{background:var(--green);box-shadow:0 0 6px var(--green)}
+.dot-red{background:var(--red);box-shadow:0 0 6px var(--red)}
+.dot-yellow{background:var(--yellow);box-shadow:0 0 6px var(--yellow)}
+.insight{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.insight.teal{border-left-color:var(--teal)}
+.insight.red{border-left-color:var(--red)}
+.insight.blue{border-left-color:var(--blue)}
+.insight-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.insight-body{font-size:11px;color:var(--text3);line-height:1.5}
+.tab-content{display:none}.tab-content.active{display:flex;flex-direction:column;gap:16px}
+.typing{display:flex;gap:4px;align-items:center;padding:4px 0}
+.typing span{width:6px;height:6px;background:var(--text3);border-radius:50%;animation:blink 1.4s ease-in-out infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+@media(max-width:640px){
+  .grid2,.grid-60-40{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:1fr 1fr}
+  .header-stats{flex-wrap:wrap}
+  .hstat{min-width:auto;flex:1 1 100px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="header">
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand-icon">🛒</div>
+        <div>
+          <div class="brand-name">KaggleMetrics</div>
+          <div class="brand-sub">E-Commerce Behavior Analytics</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost" onclick="refreshData()">&#8635; รีเฟรช</button>
+        <button class="btn btn-ghost" onclick="exportData()">&#8595; ส่งออก CSV</button>
+        <button class="btn btn-gemini" onclick="scrollToAI()">✦ Gemini วิเคราะห์</button>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat"><div class="hstat-label">GMV วันนี้</div><div class="hstat-value" id="h-gmv">฿0</div><div class="hstat-change up" id="h-gmv-ch">+0%</div></div>
+      <div class="hstat"><div class="hstat-label">คำสั่งซื้อ</div><div class="hstat-value" id="h-orders">0</div><div class="hstat-change up" id="h-orders-ch">+0%</div></div>
+      <div class="hstat"><div class="hstat-label">ผู้เยี่ยมชม</div><div class="hstat-value" id="h-visitors">0</div><div class="hstat-change up" id="h-vis-ch">+0%</div></div>
+      <div class="hstat"><div class="hstat-label">Conversion</div><div class="hstat-value" id="h-cvr">0%</div><div class="hstat-change" id="h-cvr-ch">—</div></div>
+      <div class="hstat"><div class="hstat-label">API Status</div><div class="hstat-value" style="font-size:13px;display:flex;align-items:center;gap:6px"><span class="status-dot dot-green"></span><span id="h-api-status">Online</span></div><div class="hstat-change" style="color:var(--text3)" id="h-latency">— ms</div></div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-tab active" onclick="switchTab('overview',this)">ภาพรวม</button>
+    <button class="nav-tab" onclick="switchTab('products',this)">สินค้า</button>
+    <button class="nav-tab" onclick="switchTab('customers',this)">ลูกค้า</button>
+    <button class="nav-tab" onclick="switchTab('funnel',this)">Funnel</button>
+    <button class="nav-tab" onclick="switchTab('ai',this)">✦ Gemini วิเคราะห์ <span class="badge">NEW</span></button>
+  </div>
+
+  <div class="main">
+    <div class="filter-bar">
+      <span class="filter-label">ช่วงเวลา</span>
+      <input type="date" class="filter-input" id="f-start" style="width:130px" onchange="dateInputChanged()">
+      <span style="color:var(--text3);font-size:12px">ถึง</span>
+      <input type="date" class="filter-input" id="f-end" style="width:130px" onchange="dateInputChanged()">
+      <div class="filter-sep"></div>
+      <span class="filter-label">หมวดหมู่</span>
+      <select class="filter-input" id="f-cat" style="width:150px" onchange="applyFilters()">
+        <option value="">ทุกหมวดหมู่</option>
+        <option>อิเล็กทรอนิกส์</option><option>แฟชั่น</option><option>บ้านและสวน</option>
+        <option>ความงาม</option><option>กีฬา</option><option>ของเล่น</option>
+      </select>
+      <select class="filter-input" id="f-period" style="width:130px" onchange="periodChanged()">
+        <option value="" selected>ทั้งหมด</option>
+        <option value="7">7 วันล่าสุด</option>
+        <option value="14">14 วันล่าสุด</option>
+        <option value="30">30 วันล่าสุด</option>
+        <option value="365">365 วันล่าสุด</option>
+      </select>
+      <div class="filter-sep"></div>
+      <button class="btn btn-primary" onclick="applyFilters()" style="padding:6px 14px">ใช้ตัวกรอง</button>
+      <button class="btn btn-ghost" onclick="resetFilters()" style="padding:6px 12px">ล้างค่า</button>
+      <span id="filter-status" class="pill pill-orange" style="display:none;margin-left:auto"></span>
+    </div>
+
+    <!-- OVERVIEW TAB -->
+    <div id="tab-overview" class="tab-content active">
+      <div class="kpi-row">
+        <div class="kpi orange"><div class="kpi-icon">💰</div><div class="kpi-label">รายได้รวม (GMV)</div><div class="kpi-val" id="kpi-gmv">—</div><div class="kpi-sub" id="kpi-gmv-sub" style="display:none"></div></div>
+        <div class="kpi teal"><div class="kpi-icon">📦</div><div class="kpi-label">คำสั่งซื้อ</div><div class="kpi-val" id="kpi-orders">—</div><div class="kpi-sub" id="kpi-orders-sub" style="display:none"></div></div>
+        <div class="kpi blue"><div class="kpi-icon">👤</div><div class="kpi-label">ลูกค้าทั้งหมด</div><div class="kpi-val" id="kpi-cust">—</div><div class="kpi-sub" id="kpi-cust-sub" style="display:none"></div></div>
+        <div class="kpi purple"><div class="kpi-icon">🛍️</div><div class="kpi-label">AOV เฉลี่ย</div><div class="kpi-val" id="kpi-aov">—</div><div class="kpi-sub" id="kpi-aov-sub" style="display:none"></div></div>
+        <div class="kpi red"><div class="kpi-icon">⚡</div><div class="kpi-label">Conversion Rate</div><div class="kpi-val" id="kpi-cvr">—</div><div class="kpi-sub" id="kpi-cvr-sub" style="display:none"></div></div>
+      </div>
+      <div class="grid-60-40">
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">แนวโน้มรายได้รายวัน</div><div class="panel-sub">GMV + 7 วัน Moving Average</div></div><span class="pill pill-orange">Revenue</span></div>
+          <div style="padding:12px 18px 4px;display:flex;gap:16px;align-items:center">
+            <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:10px;height:2px;background:var(--orange);border-radius:1px;display:inline-block"></span>รายได้</span>
+            <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:10px;height:2px;background:var(--teal);border-radius:1px;display:inline-block"></span>MA7</span>
+          </div>
+          <div class="chart-area"><div class="chart-canvas-wrap" style="height:200px"><canvas id="revChart"></canvas></div></div>
+          <div class="mini-bars" id="dayBars" style="padding-bottom:8px"></div>
+          <div style="padding:0 18px 12px;display:flex;justify-content:space-between;font-size:10px;color:var(--text3)"><span class="rev-chart-date-label">—</span><span class="rev-chart-date-label">—</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">สัดส่วนตามหมวดหมู่</div><div class="panel-sub">รายได้แบ่งตาม Category</div></div><span class="pill pill-purple">Category</span></div>
+          <div class="donut-wrap">
+            <svg id="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+              <defs><linearGradient id="gGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#4285f4"/><stop offset="40%" stop-color="#34a853"/><stop offset="70%" stop-color="#fbbc05"/><stop offset="100%" stop-color="#ea4335"/></linearGradient></defs>
+              <g id="donut-slices"></g>
+              <text x="60" y="56" text-anchor="middle" fill="#e8eaf0" style="font-size:16px;font-weight:700;font-family:'DM Mono',monospace">฿2.47M</text>
+              <text x="60" y="72" text-anchor="middle" fill="#5a6075" style="font-size:9px;font-family:'DM Mono',monospace">GMV รวม</text>
+            </svg>
+            <div class="donut-legend" id="donut-legend"></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">Heatmap พฤติกรรมซื้อ</div><div class="panel-sub">ชั่วโมง × วันในสัปดาห์</div></div><span class="pill pill-teal">Time Behavior</span></div>
+          <div style="padding:14px 18px 0"><div class="heatmap-col-labels" id="hm-col-labels"></div><div id="heatmap-grid"></div></div>
+          <div style="padding:8px 18px 14px;display:flex;align-items:center;gap:6px">
+            <span style="font-size:10px;color:var(--text3)">น้อย</span>
+            <div style="display:flex;gap:2px">
+              <div style="width:14px;height:10px;border-radius:2px;background:#ff6b3510"></div>
+              <div style="width:14px;height:10px;border-radius:2px;background:#ff6b3530"></div>
+              <div style="width:14px;height:10px;border-radius:2px;background:#ff6b3560"></div>
+              <div style="width:14px;height:10px;border-radius:2px;background:#ff6b3590"></div>
+              <div style="width:14px;height:10px;border-radius:2px;background:#ff6b35"></div>
+            </div>
+            <span style="font-size:10px;color:var(--text3)">มาก</span>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">Insight อัตโนมัติ</div><div class="panel-sub">สรุปที่พร้อมนำไปตัดสินใจ</div></div><span class="pill pill-yellow">Actionable</span></div>
+          <div class="panel-body" style="padding-top:12px">
+            <div class="insight"><div class="insight-title">📈 ยอดขายพุ่งสูงในช่วง 20.00-22.00 น.</div><div class="insight-body">ควรจัดโปรโมชันและเพิ่ม inventory ในช่วงดึก ซึ่งมี conversion rate สูงถึง 5.2%</div></div>
+            <div class="insight teal"><div class="insight-title">🏆 อิเล็กทรอนิกส์ครองส่วนแบ่ง 38%</div><div class="insight-body">Category ทำรายได้สูงสุด ควรเพิ่มงบโฆษณาและเพิ่มสินค้าในหมวดนี้</div></div>
+            <div class="insight red"><div class="insight-title">⚠️ Conversion Rate ลดลง 0.2pp</div><div class="insight-body">อาจเกิดจาก cart abandonment เพิ่มขึ้น ควรตรวจสอบ checkout flow</div></div>
+            <div class="insight blue"><div class="insight-title">👥 ลูกค้าเดิม 72% ของรายได้</div><div class="insight-body">Retention ดีเยี่ยม ควรลงทุน loyalty program เพื่อรักษากลุ่มนี้</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS TAB -->
+    <div id="tab-products" class="tab-content">
+      <div class="grid2">
+        <div class="panel"><div class="panel-head"><div><div class="panel-title">Top สินค้าทำรายได้</div><div class="panel-sub">เรียงตาม GMV สะสม</div></div><span class="pill pill-orange">Pareto</span></div><div class="seg-bars" id="top-products-bars" style="padding-top:12px"></div></div>
+        <div class="panel"><div class="panel-head"><div><div class="panel-title">สินค้าขายดีสุด 10 อันดับ</div><div class="panel-sub">รายได้และจำนวนขาย</div></div><span class="pill pill-teal">Top 10</span></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>สินค้า</th><th>หมวด</th><th class="tbl-num">GMV</th><th class="tbl-num">ขาย</th><th>สถานะ</th></tr></thead><tbody id="products-tbl-body"></tbody></table></div></div>
+      </div>
+      <div class="panel"><div class="panel-head"><div><div class="panel-title">Pareto Analysis — สินค้า 20% สร้างรายได้ 80%</div><div class="panel-sub">คลิกสินค้าเพื่อดูรายละเอียด</div></div><span class="pill pill-purple">80/20 Rule</span></div><div class="chart-area"><div class="chart-canvas-wrap" style="height:220px"><canvas id="paretoChart"></canvas></div></div></div>
+    </div>
+
+    <!-- CUSTOMERS TAB -->
+    <div id="tab-customers" class="tab-content">
+      <div class="kpi-row">
+        <div class="kpi teal"><div class="kpi-icon">👑</div><div class="kpi-label">VIP + Loyal</div><div class="kpi-val">—</div><div class="kpi-sub">—</div></div>
+        <div class="kpi blue"><div class="kpi-icon">⚠️</div><div class="kpi-label">At Risk</div><div class="kpi-val">—</div><div class="kpi-sub">—</div></div>
+        <div class="kpi orange"><div class="kpi-icon">📊</div><div class="kpi-label">VIP+Loyal Rate</div><div class="kpi-val">—</div><div class="kpi-sub">—</div></div>
+        <div class="kpi red"><div class="kpi-icon">🚪</div><div class="kpi-label">Churn Risk (ตัวอย่าง)</div><div class="kpi-val">—</div><div class="kpi-sub">—</div></div>
+      </div>
+      <div class="grid2">
+        <div class="panel"><div class="panel-head"><div><div class="panel-title">RFM Segmentation</div><div class="panel-sub">จัดกลุ่มลูกค้าตาม Recency, Frequency, Monetary</div></div><span class="pill pill-purple">Segment</span></div><div class="seg-bars" id="rfm-bars" style="padding-top:12px"></div></div>
+        <div class="panel"><div class="panel-head"><div><div class="panel-title">ลูกค้าเสี่ยงหาย</div><div class="panel-sub">ควรทำ CRM ทันที</div></div><span class="pill pill-red">Churn Risk</span></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>User ID</th><th>Recency</th><th>Orders</th><th class="tbl-num">LTV</th><th>กลุ่ม</th></tr></thead><tbody id="churn-tbl-body"></tbody></table></div></div>
+      </div>
+    </div>
+
+    <!-- FUNNEL TAB -->
+    <div id="tab-funnel" class="tab-content">
+      <div class="grid2">
+        <div class="panel"><div class="panel-head"><div><div class="panel-title">Sales Funnel</div><div class="panel-sub">View → Cart → Checkout → Purchase</div></div><span class="pill pill-teal">Conversion</span></div><div class="funnel" id="funnel-steps"></div></div>
+        <div class="panel"><div class="panel-head"><div><div class="panel-title">Drop-off Analysis</div><div class="panel-sub">จุดที่ลูกค้าออกจาก Funnel</div></div><span class="pill pill-red">Drop-off</span></div><div class="panel-body" id="dropoff-insights"></div></div>
+      </div>
+      <div class="panel"><div class="panel-head"><div><div class="panel-title">Conversion Trend รายวัน</div><div class="panel-sub">อัตรา Conversion 30 วันล่าสุด</div></div><span class="pill pill-blue">Trend</span></div><div class="chart-area"><div class="chart-canvas-wrap" style="height:200px"><canvas id="cvrChart"></canvas></div></div></div>
+    </div>
+
+    <!-- GEMINI AI TAB -->
+    <div id="tab-ai" class="tab-content">
+      <div class="panel ai-panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title" style="display:flex;align-items:center;gap:8px">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <defs><linearGradient id="gG2" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#4285f4"/><stop offset="40%" stop-color="#34a853"/><stop offset="70%" stop-color="#fbbc05"/><stop offset="100%" stop-color="#ea4335"/></linearGradient></defs>
+                <path d="M12 2C12 2 14.5 9.5 22 12C14.5 14.5 12 22 12 22C12 22 9.5 14.5 2 12C9.5 9.5 12 2 12 2Z" fill="url(#gG2)"/>
+              </svg>
+              Gemini AI วิเคราะห์ข้อมูล
+            </div>
+            <div class="panel-sub">ถามคำถามเชิงธุรกิจ — Gemini จะวิเคราะห์จากข้อมูลจริงของคุณ</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="status-dot" id="gemini-status-dot" style="background:#ffd23f;box-shadow:0 0 6px #ffd23f"></span>
+            <span class="pill pill-gemini">Google Gemini</span>
+          </div>
+        </div>
+
+        <!-- API KEY SETUP BOX -->
+        <div class="api-key-box" id="api-key-setup">
+          <div class="api-key-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 14.5 9.5 22 12C14.5 14.5 12 22 12 22C12 22 9.5 14.5 2 12C9.5 9.5 12 2 12 2Z" fill="url(#gG2)"/></svg>
+            ตั้งค่า Gemini API Key
+          </div>
+          <div class="api-key-sub">กรอก Google AI Studio API Key เพื่อเปิดใช้งาน Gemini AI<br>Key จะถูกเก็บใน sessionStorage ของ browser เท่านั้น ไม่ได้ส่งไปที่ใดนอกจาก Google API</div>
+          <div class="api-key-row">
+            <input type="password" class="api-key-input" id="gemini-api-key" placeholder="AIza...xxxx"/>
+            <button class="btn-gemini-sm" onclick="saveApiKey()">บันทึก &amp; เริ่มใช้งาน</button>
+          </div>
+          <div class="api-key-hint">รับ API Key ฟรีได้ที่ <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio →</a> &nbsp;|&nbsp; รองรับ Gemini 2.0 Flash (ฟรี tier: 15 req/min)</div>
+        </div>
+
+        <!-- MODEL SELECTOR (shown after key saved) -->
+        <div class="model-selector" id="model-selector-row" style="display:none">
+          <span class="model-label">Model</span>
+          <select class="model-select" id="gemini-model">
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash ⚡ (แนะนำ)</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro 🧠</option>
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+          </select>
+          <span style="flex:1"></span>
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="clearApiKey()">🔑 เปลี่ยน Key</button>
+        </div>
+
+        <div class="ai-messages" id="ai-messages">
+          <div class="ai-msg">
+            <div class="ai-avatar bot">✦</div>
+            <div class="ai-bubble">
+              สวัสดีครับ! ผมคือ <strong>Gemini AI</strong> ผู้ช่วยวิเคราะห์ข้อมูล E-Commerce ของคุณ 🛒<br><br>
+              ผมสามารถช่วยวิเคราะห์ <strong>รายได้, สินค้า, ลูกค้า, Funnel</strong> และ <strong>แนวโน้ม</strong>ต่างๆ ได้<br><br>
+              กรุณากรอก <strong>Gemini API Key</strong> ด้านบนก่อนเริ่มต้นใช้งานครับ 🔑
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-chips">
+          <div class="ai-chip" onclick="sendPreset('วิเคราะห์สาเหตุที่ conversion rate ลดลง และแนะนำวิธีแก้ไข')">🔍 Conversion ลดลงทำไม?</div>
+          <div class="ai-chip" onclick="sendPreset('สินค้าไหนควรเพิ่ม stock ก่อน Flash Sale?')">📦 สินค้าควร restock?</div>
+          <div class="ai-chip" onclick="sendPreset('วิเคราะห์กลุ่มลูกค้าที่เสี่ยงหาย และแนะนำกลยุทธ์ retention')">👥 Retention Strategy</div>
+          <div class="ai-chip" onclick="sendPreset('หมวดหมู่ไหนมีโอกาสเติบโตมากที่สุดในเดือนหน้า?')">📈 โอกาสเติบโต?</div>
+          <div class="ai-chip" onclick="sendPreset('สรุป KPI ทั้งหมดและให้คะแนนสุขภาพธุรกิจ')">🏥 Business Health Check</div>
+          <div class="ai-chip" onclick="sendPreset('แนะนำกลยุทธ์โปรโมชันสำหรับเดือนหน้าจากข้อมูล seasonality')">🎯 กลยุทธ์โปรโมชัน</div>
+        </div>
+        <div class="ai-input-row">
+          <textarea class="ai-input" id="ai-input" placeholder="ถามเกี่ยวกับข้อมูล E-Commerce ของคุณ... (กด Enter เพื่อส่ง)" rows="1" onkeydown="handleAiKey(event)"></textarea>
+          <button class="ai-send" id="ai-send-btn" onclick="sendAiMessage()">ส่ง ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

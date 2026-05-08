@@ -1,0 +1,18 @@
+{
+  "csv_read_seconds": 86.731,
+  "parquet_write_seconds": 72.762,
+  "parquet_read_seconds": 0.425,
+  "csv_rows": 1000000,
+  "parquet_rows": 1000000,
+  "batch_size": 500000,
+  "num_parquet_files": 2,
+  "num_batches": 2,
+  "speedup_csv_vs_parquet": 203.87,
+  "winner": "parquet",
+  "csv_files": [
+    "/home/airflow/.cache/kagglehub/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/versions/8/2019-Oct.csv",
+    "/home/airflow/.cache/kagglehub/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/versions/8/2019-Nov.csv"
+  ],
+  "rows_per_file_limit": 500000,
+  "measured_at": "2026-05-08T07:11:18.384656+00:00"
+}

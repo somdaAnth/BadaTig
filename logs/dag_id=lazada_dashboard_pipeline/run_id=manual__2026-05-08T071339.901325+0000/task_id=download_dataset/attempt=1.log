@@ -1,0 +1,19 @@
+[2026-05-08T07:13:45.422+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2026-05-08T07:13:45.435+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: lazada_dashboard_pipeline.download_dataset manual__2026-05-08T07:13:39.901325+00:00 [queued]>
+[2026-05-08T07:13:45.443+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: lazada_dashboard_pipeline.download_dataset manual__2026-05-08T07:13:39.901325+00:00 [queued]>
+[2026-05-08T07:13:45.444+0000] {taskinstance.py:2866} INFO - Starting attempt 1 of 2
+[2026-05-08T07:13:45.455+0000] {taskinstance.py:2889} INFO - Executing <Task(PythonOperator): download_dataset> on 2026-05-08 07:13:39.901325+00:00
+[2026-05-08T07:13:45.458+0000] {standard_task_runner.py:72} INFO - Started process 3807 to run task
+[2026-05-08T07:13:45.460+0000] {standard_task_runner.py:104} INFO - Running: ['***', 'tasks', 'run', 'lazada_dashboard_pipeline', 'download_dataset', 'manual__2026-05-08T07:13:39.901325+00:00', '--job-id', '15', '--raw', '--subdir', 'DAGS_FOLDER/lazada_dashboard_dag.py', '--cfg-path', '/tmp/tmpgbruixt5']
+[2026-05-08T07:13:45.462+0000] {standard_task_runner.py:105} INFO - Job 15: Subtask download_dataset
+[2026-05-08T07:13:45.503+0000] {task_command.py:467} INFO - Running <TaskInstance: lazada_dashboard_pipeline.download_dataset manual__2026-05-08T07:13:39.901325+00:00 [running]> on host b77580192c62
+[2026-05-08T07:13:45.575+0000] {taskinstance.py:3132} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='lazada-dashboard' AIRFLOW_CTX_DAG_ID='lazada_dashboard_pipeline' AIRFLOW_CTX_TASK_ID='download_dataset' AIRFLOW_CTX_EXECUTION_DATE='2026-05-08T07:13:39.901325+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-05-08T07:13:39.901325+00:00'
+[2026-05-08T07:13:45.576+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2026-05-08T07:13:46.049+0000] {logging_mixin.py:190} INFO - [download] Pulling Kaggle dataset: mkechinov/ecommerce-behavior-data-from-multi-category-store
+[2026-05-08T07:13:47.147+0000] {logging_mixin.py:190} INFO - [download] Dataset cached at: /home/***/.cache/kagglehub/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/versions/8
+[2026-05-08T07:13:47.148+0000] {logging_mixin.py:190} INFO - [download] Cached at: /home/***/.cache/kagglehub/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/versions/8
+[2026-05-08T07:13:47.150+0000] {python.py:240} INFO - Done. Returned value was: /home/***/.cache/kagglehub/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/versions/8
+[2026-05-08T07:13:47.185+0000] {taskinstance.py:340} INFO - ::group::Post task execution logs
+[2026-05-08T07:13:47.186+0000] {taskinstance.py:352} INFO - Marking task as SUCCESS. dag_id=lazada_dashboard_pipeline, task_id=download_dataset, run_id=manual__2026-05-08T07:13:39.901325+00:00, execution_date=20260508T071339, start_date=20260508T071345, end_date=20260508T071347
+[2026-05-08T07:13:47.213+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2026-05-08T07:13:47.222+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
